@@ -1,0 +1,215 @@
+@model List<Daylifood.Models.ShipperProfile>
+@{
+    ViewData["Title"] = "Quản lý đội ngũ Shipper";
+    var activeCount = Model.Count(p => p.IsActive);
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Lexend:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<div class="admin-wrapper py-4">
+    <div class="container-fluid px-lg-5">
+        
+        <div class="d-flex flex-wrap justify-content-between align-items-end mb-5 animate-fade-in">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2">
+                        <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index" class="text-decoration-none text-muted">Admin</a></li>
+                        <li class="breadcrumb-item active fw-bold text-primary" aria-current="page">Đội ngũ Shipper</li>
+                    </ol>
+                </nav>
+                <h1 class="fw-bold text-dark-blue family-lexend mb-0">Quản lý đội ngũ Shipper</h1>
+            </div>
+            
+            <div class="d-flex gap-3 mt-3 mt-md-0">
+                <div class="stat-mini shadow-sm bg-white p-3 rounded-4 d-flex align-items-center border-start border-emerald border-4">
+                    <div class="icon-box-sm bg-soft-emerald text-emerald me-3"><i class="bi bi-bicycle"></i></div>
+                    <div>
+                        <div class="x-small text-muted fw-bold text-uppercase">Đang hoạt động</div>
+                        <div class="fs-4 fw-800">@activeCount</div>
+                    </div>
+                </div>
+                <div class="stat-mini shadow-sm bg-white p-3 rounded-4 d-flex align-items-center border-start border-danger border-4">
+                    <div class="icon-box-sm bg-soft-danger text-danger me-3"><i class="bi bi-shield-lock"></i></div>
+                    <div>
+                        <div class="x-small text-muted fw-bold text-uppercase">Đang khóa</div>
+                        <div class="fs-4 fw-800">@(Model.Count - activeCount)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-2xl rounded-5 overflow-hidden animate-slide-up">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4 py-3 text-uppercase ls-1">Tài khoản</th>
+                            <th class="py-3 text-uppercase ls-1">Khu vực phủ sóng</th>
+                            <th class="py-3 text-uppercase ls-1">Phương tiện & Biển số</th>
+                            <th class="py-3 text-uppercase ls-1 text-center">Trạng thái</th>
+                            <th class="pe-4 py-3 text-uppercase ls-1 text-end">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model)
+                        {
+                            <tr class="shipper-row">
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-letter me-3 shadow-sm">@p.User?.Email?[0].ToString().ToUpper()</div>
+                                        <div>
+                                            <div class="fw-bold text-dark-blue">@p.User?.Email</div>
+                                            <div class="x-small text-muted">ID đối tác: #S-@p.Id</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-soft-primary text-primary rounded-pill px-3 fw-600">
+                                        <i class="bi bi-geo-alt-fill me-1"></i> @p.DeliveryArea.Name
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold text-dark">@p.VehicleType</div>
+                                    <code class="license-plate">@p.LicensePlate</code>
+                                </td>
+                                <td class="text-center">
+                                    @if (p.IsActive)
+                                    {
+                                        <span class="status-indicator active">
+                                            <span class="dot pulse"></span> Hoạt động
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-indicator inactive">
+                                            <span class="dot"></span> Tạm khóa
+                                        </span>
+                                    }
+                                </td>
+                                <td class="pe-4 text-end">
+                                    <form asp-action="Toggle" method="post" onsubmit="return confirmAction('@(p.IsActive ? "KHÓA" : "MỞ KHÓA")', '@p.User?.Email')">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@p.Id" />
+                                        @if (p.IsActive)
+                                        {
+                                            <button type="submit" class="btn btn-lock-action" title="Tạm dừng hoạt động">
+                                                <i class="bi bi-lock-fill me-1"></i> Khóa tài khoản
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit" class="btn btn-unlock-action" title="Cho phép hoạt động lại">
+                                                <i class="bi bi-unlock-fill me-1"></i> Mở khóa ngay
+                                            </button>
+                                        }
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/4063/4063823.png" style="width: 80px; opacity: 0.3;" class="mb-3" />
+                                    <h5 class="text-muted">Chưa có Shipper nào trong hệ thống.</h5>
+                                    <p class="small text-muted">Các đơn đăng ký Shipper mới sẽ hiện ở mục "Duyệt đơn".</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="mt-4 text-center animate-fade-in" style="animation-delay: 0.3s">
+            <p class="text-muted small">
+                <i class="bi bi-info-circle-fill me-1 text-primary"></i> 
+                Mẹo: Bạn hãy luôn kiểm tra biển số xe định kỳ để đảm bảo an toàn vận hành cho Daylifood nhé!
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --dark-blue: #0f172a;
+        --emerald: #10b981;
+        --soft-emerald: #ecfdf5;
+        --soft-primary: #eff6ff;
+        --soft-danger: #fef2f2;
+    }
+
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+    .family-lexend { font-family: 'Lexend', sans-serif; }
+    .fw-800 { font-weight: 800; }
+    .fw-600 { font-weight: 600; }
+    .ls-1 { letter-spacing: 1px; font-size: 0.7rem; font-weight: 800; color: #94a3b8; }
+
+    /* Stats Card */
+    .icon-box-sm { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+    .bg-soft-emerald { background-color: var(--soft-emerald); color: var(--emerald); }
+    .bg-soft-danger { background-color: var(--soft-danger); color: #ef4444; }
+
+    /* Shadow & Table */
+    .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05); }
+    .table thead th { border: none; }
+    .shipper-row { transition: background 0.3s; }
+    .shipper-row:hover { background-color: #fcfcfc; }
+
+    /* User Avatar Circle */
+    .avatar-letter {
+        width: 40px; height: 40px; background: linear-gradient(135deg, #3b82f6, #1e293b);
+        color: white; border-radius: 12px; display: flex; align-items: center; 
+        justify-content: center; font-weight: 800;
+    }
+
+    /* License Plate Styling */
+    .license-plate {
+        background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 6px;
+        font-family: 'Courier New', Courier, monospace; font-size: 0.85rem; font-weight: 700;
+        border: 1px solid #e2e8f0; margin-top: 4px; display: inline-block;
+    }
+
+    /* Status Indicators */
+    .status-indicator { font-size: 0.8rem; font-weight: 700; padding: 6px 15px; border-radius: 50px; display: inline-flex; align-items: center; gap: 8px; }
+    .status-indicator.active { background: var(--soft-emerald); color: var(--emerald); }
+    .status-indicator.inactive { background: #f1f5f9; color: #64748b; }
+    
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+    .dot.pulse { animation: pulse-emerald 2s infinite; }
+
+    @@keyframes pulse-emerald {
+        0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* Action Buttons */
+    .btn-lock-action {
+        background-color: white; border: 1.5px solid #fee2e2; color: #ef4444;
+        padding: 6px 15px; border-radius: 10px; font-weight: 700; font-size: 0.8rem; transition: all 0.3s;
+    }
+    .btn-lock-action:hover { background-color: #ef4444; color: white; border-color: #ef4444; }
+
+    .btn-unlock-action {
+        background-color: var(--emerald); border: none; color: white;
+        padding: 6px 15px; border-radius: 10px; font-weight: 700; font-size: 0.8rem; transition: all 0.3s;
+        box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+    }
+    .btn-unlock-action:hover { background-color: #059669; transform: translateY(-2px); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.3); }
+
+    /* Animations */
+    @@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-slide-up { animation: fadeInUp 0.6s ease-out both; }
+    .animate-fade-in { animation: fadeInUp 0.4s ease-out both; }
+    .x-small { font-size: 0.65rem; }
+</style>
+
+@section Scripts {
+    <script>
+        function confirmAction(actionType, email) {
+            return confirm(`Bạn có chắc chắn muốn ${actionType} tài khoản của Shipper: ${email} chứ?`);
+        }
+    </script>
+}

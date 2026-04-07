@@ -1,0 +1,315 @@
+@model Daylifood.Models.Cart
+@{
+    ViewData["Title"] = "Giỏ hàng của bạn";
+    var lines = Model.Items.ToList();
+    decimal total = 0;
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<div class="cart-page-bg py-5">
+    <div class="container mt-md-4">
+        <div class="d-flex align-items-center mb-4">
+            <div class="brand-icon-box me-3">
+                <i class="bi bi-cart-check-fill"></i>
+            </div>
+            <div>
+                <h2 class="fw-bold mb-0 family-comfortaa text-dark-blue">Giỏ hàng của bạn</h2>
+                <p class="text-muted small mb-0">Bạn ơi, kiểm tra lại món ngon trước khi thanh toán nhé!</p>
+            </div>
+        </div>
+
+        @if (!lines.Any())
+        {
+            <div class="empty-cart-card text-center py-5 shadow-sm">
+                <div class="empty-img-container mb-4">
+                    <img src="https://cdn-icons-png.flaticon.com/512/11329/11329060.png" alt="Empty Cart">
+                </div>
+                <h4 class="fw-bold text-dark mb-3">Ôi không! Giỏ hàng đang trống</h4>
+                <p class="text-muted mb-4 px-3">Bao tử của bạn đang biểu tình kìa. <br> Hãy lấp đầy nó bằng những món ngon nóng hổi từ Daylifood!</p>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-food-gradient px-5 py-3 rounded-pill fw-bold">
+                    KHÁM PHÁ THỰC ĐƠN NGAY
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="cart-items-container">
+                        @foreach (var line in lines)
+                        {
+                            var lineTotal = line.Product.Price * line.Quantity;
+                            total += lineTotal;
+                            
+                            <div class="cart-item-card shadow-sm mb-3">
+                                <div class="row align-items-center g-0">
+                                    <div class="col-3 col-md-2 p-2">
+                                        <div class="img-wrapper rounded-4 overflow-hidden">
+                                            <img src="@(line.Product.ImageUrl ?? "/images/default-food.png")" alt="@line.Product.Name">
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-5 p-3">
+                                        <h6 class="fw-bold text-dark mb-1">@line.Product.Name</h6>
+                                        <div class="text-orange fw-bold">@line.Product.Price.ToString("N0") <small>đ</small></div>
+                                    </div>
+                                    <div class="col-3 col-md-3 p-2">
+                                        <form asp-action="Update" method="post" class="qty-pill d-flex align-items-center justify-content-between">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="cartItemId" value="@line.Id" />
+                                            
+                                            <button type="button" class="btn-qty" onclick="changeQty(this, -1)">
+                                                <i class="bi bi-dash-lg"></i>
+                                            </button>
+                                            
+                                            <input type="number" name="quantity" value="@line.Quantity" min="1" max="@line.Product.Stock" 
+                                                   class="input-quantity" onchange="this.form.submit()" readonly />
+                                            
+                                            <button type="button" class="btn-qty" onclick="changeQty(this, 1)">
+                                                <i class="bi bi-plus-lg"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <div class="col-12 col-md-2 text-md-end p-3 d-flex d-md-block justify-content-between align-items-center border-top-mobile">
+                                        <div class="fw-bold text-dark-blue d-md-block mb-md-2">@lineTotal.ToString("N0") đ</div>
+                                        <form asp-action="Remove" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="cartItemId" value="@line.Id" />
+                                            <button type="submit" class="btn-remove-item" title="Xóa khỏi giỏ">
+                                                <i class="bi bi-trash3-fill"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-4">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-soft rounded-pill px-4 fw-600">
+                            <i class="bi bi-arrow-left me-2"></i>Chọn thêm món
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="summary-card shadow-lg sticky-top" style="top: 100px;">
+                        <h5 class="fw-bold mb-4 family-comfortaa">Tổng thanh toán</h5>
+                        
+                        <div class="shipping-info mb-4">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="small fw-bold">Miễn phí vận chuyển</span>
+                                <span class="small text-success fw-bold">Đã đạt điều kiện!</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="width: 100%"></div>
+                            </div>
+                        </div>
+
+                        <div class="summary-line d-flex justify-content-between">
+                            <span class="text-muted">Tạm tính</span>
+                            <span class="fw-bold">@total.ToString("N0") đ</span>
+                        </div>
+                        <div class="summary-line d-flex justify-content-between mt-2">
+                            <span class="text-muted">Phí giao hàng</span>
+                            <span class="text-success fw-bold">FREE</span>
+                        </div>
+                        
+                        <hr class="my-4 opacity-25">
+                        
+                        <div class="total-line d-flex justify-content-between align-items-end mb-4">
+                            <span class="fw-bold text-dark">Tổng cộng</span>
+                            <div class="text-end">
+                                <h3 class="fw-bold text-orange mb-0">@total.ToString("N0") đ</h3>
+                                <small class="text-muted">(Đã bao gồm VAT)</small>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-3">
+                            <a asp-controller="Order" asp-action="Checkout" class="btn btn-food-gradient btn-lg py-3 rounded-4 shadow-orange fw-bold">
+                                THANH TOÁN NGAY <i class="bi bi-arrow-right-short ms-1"></i>
+                            </a>
+                            
+                            <div class="payment-methods text-center">
+                                <p class="x-small text-muted mb-2">Hỗ trợ thanh toán đa dạng</p>
+                                <div class="d-flex justify-content-center gap-2 opacity-50 grayscale">
+                                    <i class="bi bi-credit-card-2-front fs-4"></i>
+                                    <i class="bi bi-wallet2 fs-4"></i>
+                                    <i class="bi bi-cash-stack fs-4"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    :root {
+        --food-orange: #ff7e5f;
+        --food-orange-dark: #ff6b6b;
+        --dark-blue: #1e293b;
+        --soft-bg: #fdfaf8;
+    }
+
+    body { font-family: 'Lexend', sans-serif; background-color: var(--soft-bg); }
+    .family-comfortaa { font-family: 'Comfortaa', cursive; }
+    .text-orange { color: var(--food-orange); }
+    .text-dark-blue { color: var(--dark-blue); }
+
+    /* Header Icon */
+    .brand-icon-box {
+        width: 50px; height: 50px;
+        background: white;
+        color: var(--food-orange);
+        border-radius: 15px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem;
+        box-shadow: 0 10px 20px rgba(255, 126, 95, 0.1);
+    }
+
+    /* Cart Items */
+    .cart-item-card {
+        background: white;
+        border-radius: 25px;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+    .cart-item-card:hover {
+        border-color: #fee2e2;
+        transform: translateY(-2px);
+    }
+
+    .img-wrapper img {
+        width: 100%;
+        height: 80px;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    .cart-item-card:hover .img-wrapper img { transform: scale(1.1); }
+
+    /* Quantity Pill */
+    .qty-pill {
+        background: #f1f5f9;
+        border-radius: 50px;
+        padding: 5px 10px;
+    }
+    .btn-qty {
+        width: 28px; height: 28px;
+        border-radius: 50%;
+        border: none;
+        background: white;
+        color: var(--dark-blue);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.8rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        transition: all 0.2s;
+    }
+    .btn-qty:hover { background: var(--food-orange); color: white; }
+
+    .input-quantity {
+        width: 35px;
+        border: none;
+        background: transparent;
+        text-align: center;
+        font-weight: 700;
+        color: var(--dark-blue);
+        outline: none;
+    }
+
+    /* Actions */
+    .btn-remove-item {
+        background: #fee2e2;
+        color: #ef4444;
+        border: none;
+        width: 35px; height: 35px;
+        border-radius: 50%;
+        display: inline-flex; align-items: center; justify-content: center;
+        transition: all 0.2s;
+    }
+    .btn-remove-item:hover { background: #ef4444; color: white; transform: rotate(15deg); }
+
+    /* Summary Card */
+    .summary-card {
+        background: white;
+        border-radius: 30px;
+        padding: 30px;
+        border: 1px solid rgba(0,0,0,0.03);
+    }
+
+    .btn-food-gradient {
+        background: linear-gradient(45deg, var(--food-orange), var(--food-orange-dark));
+        color: white; border: none;
+        transition: all 0.3s;
+    }
+    .btn-food-gradient:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(255, 126, 95, 0.4);
+        color: white;
+    }
+
+    .btn-outline-soft {
+        background: white;
+        border: 2px solid #f1f5f9;
+        color: #64748b;
+        transition: all 0.3s;
+    }
+    .btn-outline-soft:hover { background: #f1f5f9; border-color: #e2e8f0; }
+
+    /* Mobile Responsive */
+    @@media (max-width: 767px) {
+        .border-top-mobile { border-top: 1px dashed #f1f5f9; margin-top: 5px; }
+        .img-wrapper img { height: 70px; }
+    }
+
+    /* Grayscale icons */
+    .grayscale { filter: grayscale(1); }
+    .x-small { font-size: 0.7rem; }
+    
+    .empty-cart-card {
+        background: white;
+        border-radius: 40px;
+    }
+    .empty-img-container img {
+        width: 200px;
+        animation: float 4s infinite ease-in-out;
+    }
+    @@keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Hàm xử lý tăng giảm số lượng mượt mà
+        function changeQty(btn, delta) {
+            const input = btn.parentNode.querySelector('.input-quantity');
+            let currentValue = parseInt(input.value);
+            let min = parseInt(input.getAttribute('min'));
+            let max = parseInt(input.getAttribute('max'));
+            
+            let newValue = currentValue + delta;
+            
+            if (newValue >= min && newValue <= max) {
+                input.value = newValue;
+                
+                // Hiệu ứng loading nhẹ trên row
+                const row = btn.closest('.cart-item-card');
+                row.style.opacity = '0.6';
+                
+                // Tự động submit form
+                btn.closest('form').submit();
+            }
+        }
+
+        // Tự động ẩn các nút spin của input type number
+        document.querySelectorAll('input[type=number]').forEach(input => {
+            input.addEventListener('wheel', e => e.preventDefault());
+        });
+    </script>
+}

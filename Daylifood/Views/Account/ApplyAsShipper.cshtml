@@ -1,0 +1,270 @@
+@model ApplyShipperViewModel
+@{
+    ViewData["Title"] = "Gia nhập đội ngũ giao hàng Daylifood";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<div class="delivery-wrapper py-5">
+    <div class="map-pattern"></div>
+
+    <div class="container position-relative">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <div class="shipper-card border-0 shadow-2xl rounded-5 overflow-hidden">
+                    <div class="row g-0">
+                        <div class="col-md-4 d-none d-md-flex flex-column justify-content-between p-5 text-white position-relative side-info">
+                            <div class="info-content">
+                                <div class="brand-badge mb-4">Daylifood Express</div>
+                                <h2 class="fw-bold display-6 mb-3">Lên xe thôi, bạn ơi!</h2>
+                                <p class="opacity-75 fw-light">Cùng mang niềm vui món ngon đến mọi nẻo đường thành phố.</p>
+                                
+                                <ul class="list-unstyled mt-5">
+                                    <li class="mb-3 d-flex align-items-center">
+                                        <div class="icon-circle me-3"><i class="bi bi-lightning-charge-fill"></i></div>
+                                        <span>Thu nhập hấp dẫn</span>
+                                    </li>
+                                    <li class="mb-3 d-flex align-items-center">
+                                        <div class="icon-circle me-3"><i class="bi bi-clock-history"></i></div>
+                                        <span>Giờ giấc linh hoạt</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="rider-animation text-center">
+                                <i class="bi bi-bicycle display-1 text-white opacity-25"></i>
+                            </div>
+                        </div>
+
+                        <div class="col-md-8 bg-white p-4 p-lg-5">
+                            <div class="form-header mb-4">
+                                <h3 class="fw-bold text-emerald">Đăng ký cộng tác viên</h3>
+                                <p class="text-muted small">Vui lòng cung cấp thông tin phương tiện chính xác</p>
+                            </div>
+
+                            <form asp-action="ApplyAsShipper" method="post" id="shipperForm">
+                                @Html.AntiForgeryToken()
+                                <div asp-validation-summary="ModelOnly" class="alert alert-soft-danger py-2 small border-0"></div>
+
+                                <div class="mb-4">
+                                    <label asp-for="DeliveryAreaId" class="form-label-custom">KHU VỰC HOẠT ĐỘNG</label>
+                                    <div class="input-modern-group">
+                                        <i class="bi bi-geo-alt icon-main"></i>
+                                        <select asp-for="DeliveryAreaId" asp-items="ViewBag.DeliveryAreas" class="form-select-modern">
+                                            <option value="">-- Chọn quận/huyện bạn muốn chạy --</option>
+                                        </select>
+                                    </div>
+                                    <span asp-validation-for="DeliveryAreaId" class="text-danger-custom"></span>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-6 mb-4">
+                                        <label asp-for="VehicleType" class="form-label-custom">LOẠI XE</label>
+                                        <div class="input-modern-group">
+                                            <i class="bi bi-bicycle icon-main"></i>
+                                            <input asp-for="VehicleType" class="form-control-modern" placeholder="VD: Honda AirBlade" />
+                                        </div>
+                                        <span asp-validation-for="VehicleType" class="text-danger-custom"></span>
+                                    </div>
+
+                                    <div class="col-sm-6 mb-4">
+                                        <label asp-for="LicensePlate" class="form-label-custom">BIỂN SỐ XE</label>
+                                        <div class="input-modern-group">
+                                            <i class="bi bi-postcard icon-main"></i>
+                                            <input asp-for="LicensePlate" class="form-control-modern" placeholder="VD: 59-G1 12345" />
+                                        </div>
+                                        <span asp-validation-for="LicensePlate" class="text-danger-custom"></span>
+                                    </div>
+                                </div>
+
+                                <div class="mt-5 d-grid">
+                                    <button type="submit" id="btnSubmit" class="btn btn-emerald-delivery py-3 fw-bold rounded-pill shadow-green">
+                                        BẮT ĐẦU KIẾM TIỀN NGAY <i class="bi bi-chevron-right ms-2"></i>
+                                    </button>
+                                    <a asp-action="Profile" class="btn btn-link text-secondary text-decoration-none mt-3 small">
+                                        <i class="bi bi-arrow-left"></i> Tôi muốn quay lại
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --emerald: #0fb176;
+        --emerald-dark: #0a8a5c;
+        --mint-light: #e6f9f1;
+        --dark-navy: #1a2b3c;
+    }
+
+    body { font-family: 'Lexend', sans-serif; background: #f8fafc; }
+
+    /* Background Map Effect */
+    .delivery-wrapper {
+        min-height: 100vh;
+        position: relative;
+        overflow: hidden;
+        background: #f0f7f4;
+    }
+
+    .map-pattern {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background-image: url('https://www.transparenttextures.com/patterns/stardust.png'); /* Pattern nhẹ */
+        opacity: 0.5;
+        z-index: 0;
+    }
+
+    /* Side Info Section */
+    .side-info {
+        background: linear-gradient(135deg, var(--emerald) 0%, var(--dark-navy) 100%);
+        border-right: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .brand-badge {
+        display: inline-block;
+        padding: 5px 15px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 50px;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+
+    .icon-circle {
+        width: 35px; height: 35px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1rem;
+    }
+
+    /* Main Card */
+    .shipper-card {
+        z-index: 1;
+        position: relative;
+        box-shadow: 0 30px 60px rgba(15, 177, 118, 0.15);
+    }
+
+    /* Input Modern Styling */
+    .form-label-custom {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #64748b;
+        margin-left: 5px;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .input-modern-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+        background: #f1f5f9;
+        border: 2px solid transparent;
+        border-radius: 16px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .input-modern-group:focus-within {
+        background: #fff;
+        border-color: var(--emerald);
+        box-shadow: 0 10px 20px rgba(15, 177, 118, 0.08);
+        transform: translateY(-2px);
+    }
+
+    .icon-main {
+        padding: 0 15px;
+        color: #94a3b8;
+        font-size: 1.2rem;
+    }
+
+    .form-control-modern, .form-select-modern {
+        background: transparent;
+        border: none;
+        padding: 12px 15px 12px 0;
+        width: 100%;
+        outline: none;
+        color: var(--dark-navy);
+        font-weight: 500;
+    }
+
+    .text-danger-custom { font-size: 0.7rem; color: #ef4444; margin-top: 5px; display: block; }
+
+    /* Button Emerald */
+    .btn-emerald-delivery {
+        background: linear-gradient(45deg, var(--emerald), #22c55e);
+        color: white;
+        border: none;
+        transition: all 0.4s;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-emerald-delivery:hover {
+        background: linear-gradient(45deg, #22c55e, var(--emerald));
+        transform: scale(1.02);
+        box-shadow: 0 15px 30px rgba(15, 177, 118, 0.3);
+        color: white;
+    }
+
+    .alert-soft-danger { background: #fee2e2; color: #991b1b; }
+
+    /* Animations */
+    @@keyframes bikeFloat {
+        0% { transform: translateX(-10px); opacity: 0.2; }
+        50% { transform: translateX(10px); opacity: 0.4; }
+        100% { transform: translateX(-10px); opacity: 0.2; }
+    }
+    .rider-animation { animation: bikeFloat 4s infinite ease-in-out; }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('shipperForm');
+            const btnSubmit = document.getElementById('btnSubmit');
+            const inputs = document.querySelectorAll('.form-control-modern, .form-select-modern');
+
+            // 1. Hiệu ứng focus icon
+            inputs.forEach(input => {
+                input.addEventListener('focus', () => {
+                    input.previousElementSibling.style.color = 'var(--emerald)';
+                });
+                input.addEventListener('blur', () => {
+                    input.previousElementSibling.style.color = '#94a3b8';
+                });
+            });
+
+            // 2. Format biển số xe tự động (giả lập)
+            const licenseInput = document.querySelector('[name="LicensePlate"]');
+            licenseInput.addEventListener('input', function(e) {
+                this.value = this.value.toUpperCase();
+            });
+
+            // 3. Loading state khi submit
+            form.addEventListener('submit', (e) => {
+                if ($(form).valid()) {
+                    btnSubmit.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> ĐANG XỬ LÝ...`;
+                    btnSubmit.style.opacity = '0.8';
+                    btnSubmit.style.pointerEvents = 'none';
+                }
+            });
+
+            // 4. Parallax nhẹ cho card theo chuột
+            const card = document.querySelector('.shipper-card');
+            document.addEventListener('mousemove', (e) => {
+                const xAxis = (window.innerWidth / 2 - e.pageX) / 70;
+                const yAxis = (window.innerHeight / 2 - e.pageY) / 70;
+                card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            });
+        });
+    </script>
+}

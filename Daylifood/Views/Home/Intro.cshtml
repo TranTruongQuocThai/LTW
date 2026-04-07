@@ -1,0 +1,259 @@
+@model dynamic
+@{
+    ViewData["Title"] = "Về Daylifood";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&family=Pacifico&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<div class="intro-page">
+    <section class="hero-section position-relative overflow-hidden rounded-5 mb-5 shadow-lg">
+        <div class="hero-overlay"></div>
+        <div class="floating-food f-1"><i class="bi bi-pizza"></i></div>
+        <div class="floating-food f-2"><i class="bi bi-cup-straw"></i></div>
+        <div class="floating-food f-3"><i class="bi bi-egg-fried"></i></div>
+
+        <div class="container position-relative z-3 py-5 text-center text-white">
+            <div class="animate-up">
+                <h1 class="brand-font display-3 mb-3">Daylifood</h1>
+                <h2 class="fw-bold mb-4 family-comfortaa">Ship Niềm Vui - Trao Món Ngon</h2>
+                <p class="lead mb-5 mx-auto opacity-90" style="max-width: 40rem;">
+                    Nền tảng kết nối ẩm thực địa phương, mang hàng ngàn món ngon từ bếp lò đến tận bàn ăn của bạn chỉ trong tích tắc.
+                </p>
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <a asp-action="Index" class="btn btn-light-orange btn-lg px-5 rounded-pill fw-bold shadow-orange">
+                        ĐẶT MÓN NGAY <i class="bi bi-arrow-right-short"></i>
+                    </a>
+                    <a asp-action="Stores" class="btn btn-outline-light btn-lg px-4 rounded-pill border-2">
+                        XEM QUÁN NGON
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="container mb-5">
+        <div class="row g-4 text-center">
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-3 rounded-4 bg-white shadow-sm border-bottom border-4 border-warning">
+                    <h3 class="fw-bold text-orange mb-0 counter" data-target="500">0</h3>
+                    <small class="text-muted fw-bold">CỬA HÀNG</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-3 rounded-4 bg-white shadow-sm border-bottom border-4 border-success">
+                    <h3 class="fw-bold text-success mb-0 counter" data-target="1200">0</h3>
+                    <small class="text-muted fw-bold">MÓN NGON</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-3 rounded-4 bg-white shadow-sm border-bottom border-4 border-primary">
+                    <h3 class="fw-bold text-primary mb-0 counter" data-target="300">0</h3>
+                    <small class="text-muted fw-bold">SHIPPER</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-3 rounded-4 bg-white shadow-sm border-bottom border-4 border-danger">
+                    <h3 class="fw-bold text-danger mb-0 counter" data-target="10">0</h3>
+                    <small class="text-muted fw-bold">PHÚT GIAO NHANH</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container py-4 mb-5">
+        <div class="text-center mb-5">
+            <h3 class="fw-bold family-comfortaa">Tại sao chọn Daylifood?</h3>
+            <div class="divider-orange mx-auto"></div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card h-100 p-5 text-center rounded-5 bg-white shadow-hover">
+                    <div class="icon-circle bg-soft-success mb-4 mx-auto">
+                        <i class="bi bi-basket3-fill"></i>
+                    </div>
+                    <h4 class="fw-bold h5">Đa dạng lựa chọn</h4>
+                    <p class="text-muted small">Hàng trăm quán ăn địa phương với menu được cập nhật mới mỗi ngày, từ bình dân đến cao cấp.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card h-100 p-5 text-center rounded-5 bg-white shadow-hover">
+                    <div class="icon-circle bg-soft-warning mb-4 mx-auto">
+                        <i class="bi bi-geo-fill"></i>
+                    </div>
+                    <h4 class="fw-bold h5">Giao hàng thông minh</h4>
+                    <p class="text-muted small">Hệ thống tự động kết nối Shipper gần nhất trong khu vực, đảm bảo món ăn luôn nóng hổi khi đến tay bạn.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card h-100 p-5 text-center rounded-5 bg-white shadow-hover">
+                    <div class="icon-circle bg-soft-primary mb-4 mx-auto">
+                        <i class="bi bi-shield-lock-fill"></i>
+                    </div>
+                    <h4 class="fw-bold h5">Minh bạch & Uy tín</h4>
+                    <p class="text-muted small">Tất cả đối tác người bán và người giao hàng đều được xét duyệt nghiêm ngặt bởi đội ngũ Daylifood.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="how-it-works py-5 rounded-5 bg-white shadow-sm mb-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-5 mb-4 mb-lg-0">
+                    <h3 class="fw-bold family-comfortaa mb-4">Gia nhập đại gia đình Daylifood thật dễ dàng!</h3>
+                    <p class="text-muted mb-4">Không chỉ là người mua, bạn hoàn toàn có thể trở thành một phần của chúng tôi để cùng phát triển.</p>
+                    
+                    <div class="step-item d-flex mb-4">
+                        <div class="step-num">1</div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Đăng ký tài khoản</h6>
+                            <p class="small text-muted mb-0">Chỉ mất 30 giây để bắt đầu.</p>
+                        </div>
+                    </div>
+                    <div class="step-item d-flex mb-4">
+                        <div class="step-num">2</div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Gửi yêu cầu đối tác</h6>
+                            <p class="small text-muted mb-0">Chọn vai trò Người bán hoặc Shipper tùy theo nhu cầu.</p>
+                        </div>
+                    </div>
+                    <div class="step-item d-flex">
+                        <div class="step-num">3</div>
+                        <div>
+                            <h6 class="fw-bold mb-1">Nhận duyệt & Bắt đầu</h6>
+                            <p class="small text-muted mb-0">Sau khi được Admin duyệt, bạn chính thức trở thành cộng tác viên.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-7 text-center">
+                    <img src="https://images.unsplash.com/photo-1526367790999-0150786486a9?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" 
+                         alt="Delivery" class="img-fluid rounded-5 shadow-lg">
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<style>
+    :root {
+        --food-orange: #ff7e5f;
+        --food-red: #ff6b6b;
+        --food-green: #2ecc71;
+        --dark-blue: #1e293b;
+        --bg-warm: #fdfaf8;
+    }
+
+    body { font-family: 'Lexend', sans-serif; background-color: var(--bg-warm); }
+    .brand-font { font-family: 'Pacifico', cursive; }
+    .family-comfortaa { font-family: 'Comfortaa', cursive; }
+    .text-orange { color: var(--food-orange); }
+
+    /* Hero Section Custom */
+    .hero-section {
+        background: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80') center/cover;
+        min-height: 500px;
+        display: flex;
+        align-items: center;
+    }
+    .hero-overlay {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(135deg, rgba(25, 135, 84, 0.9) 0%, rgba(255, 126, 95, 0.8) 100%);
+    }
+
+    /* Floating Icons Animation */
+    .floating-food {
+        position: absolute; font-size: 3rem; color: rgba(255,255,255,0.2); z-index: 2;
+        animation: float 6s infinite ease-in-out;
+    }
+    .f-1 { top: 10%; left: 5%; }
+    .f-2 { bottom: 20%; right: 10%; animation-delay: 2s; }
+    .f-3 { top: 20%; right: 20%; animation-delay: 4s; }
+
+    @@keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(10deg); }
+    }
+
+    /* Feature Cards */
+    .icon-circle {
+        width: 80px; height: 80px; border-radius: 30px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2rem;
+    }
+    .bg-soft-success { background: #e8f5e9; color: #2e7d32; }
+    .bg-soft-warning { background: #fff8e1; color: #ffa000; }
+    .bg-soft-primary { background: #e3f2fd; color: #1565c0; }
+
+    .shadow-hover { transition: all 0.3s ease; }
+    .shadow-hover:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.05) !important; }
+
+    .divider-orange { width: 60px; height: 4px; background: var(--food-orange); border-radius: 10px; margin-top: 10px; }
+
+    /* Step Items */
+    .step-num {
+        min-width: 45px; height: 45px; background: var(--food-orange); color: white;
+        border-radius: 15px; display: flex; align-items: center; justify-content: center;
+        font-weight: bold; margin-right: 20px; box-shadow: 0 5px 15px rgba(255, 126, 95, 0.3);
+    }
+
+    /* Buttons */
+    .btn-light-orange { background: white; color: var(--food-orange); border: none; }
+    .btn-light-orange:hover { background: var(--food-orange); color: white; }
+    .shadow-orange { box-shadow: 0 10px 25px rgba(255, 126, 95, 0.3); }
+
+    .stat-card { transition: transform 0.3s; }
+    .stat-card:hover { transform: scale(1.05); }
+</style>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Hiệu ứng đếm số (Counter Animation)
+            const counters = document.querySelectorAll('.counter');
+            const speed = 200;
+
+            const startCounters = () => {
+                counters.forEach(counter => {
+                    const updateCount = () => {
+                        const target = +counter.getAttribute('data-target');
+                        const count = +counter.innerText;
+                        const inc = target / speed;
+
+                        if (count < target) {
+                            counter.innerText = Math.ceil(count + inc);
+                            setTimeout(updateCount, 1);
+                        } else {
+                            counter.innerText = target.toLocaleString() + (target === 10 ? '+' : '');
+                        }
+                    };
+                    updateCount();
+                });
+            };
+
+            // Chạy counter khi người dùng cuộn đến
+            const observer = new IntersectionObserver((entries) => {
+                if(entries[0].isIntersecting) {
+                    startCounters();
+                    observer.disconnect();
+                }
+            }, { threshold: 0.5 });
+
+            observer.observe(document.querySelector('.stat-card'));
+
+            // Fade in animation
+            const animatedElements = document.querySelectorAll('.animate-up');
+            animatedElements.forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'all 0.8s ease-out';
+                
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, 300);
+            });
+        });
+    </script>
+}

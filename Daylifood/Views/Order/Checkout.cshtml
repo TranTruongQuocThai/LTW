@@ -1,0 +1,128 @@
+@model CheckoutViewModel
+@using Daylifood.Models
+@{
+    ViewData["Title"] = "Xác nhận đơn hàng";
+    var cartTotal = ViewBag.CartTotal is decimal total ? total : 0m;
+}
+
+<div class="container py-5">
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-4 p-lg-5">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        <div class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center" style="width:56px;height:56px;">
+                            <i class="bi bi-credit-card fs-4"></i>
+                        </div>
+                        <div>
+                            <h2 class="h4 fw-bold mb-1">Xác nhận đơn hàng</h2>
+                            <div class="text-muted">Chọn khu vực giao hàng và phương thức thanh toán</div>
+                        </div>
+                    </div>
+
+                    <form asp-action="Checkout" method="post" id="checkoutForm">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-4 border-0"></div>
+
+                        <div class="mb-4">
+                            <label asp-for="DeliveryAreaId" class="form-label fw-semibold"></label>
+                            <select asp-for="DeliveryAreaId" asp-items="ViewBag.DeliveryAreas" class="form-select form-select-lg rounded-4">
+                                <option value="">Chọn khu vực giao hàng</option>
+                            </select>
+                            <span asp-validation-for="DeliveryAreaId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="DeliveryAddress" class="form-label fw-semibold"></label>
+                            <textarea asp-for="DeliveryAddress" class="form-control rounded-4" rows="4" placeholder="Số nhà, đường, phường/xã, ghi chú giao hàng..."></textarea>
+                            <span asp-validation-for="DeliveryAddress" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Phương thức thanh toán</label>
+                            <div class="d-grid gap-3">
+                                <label class="payment-choice card border-2 rounded-4 p-3 @(Model.PaymentMethod == PaymentMethod.Cod ? "border-success" : "border-light")">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <input class="form-check-input mt-1" type="radio" asp-for="PaymentMethod" value="@PaymentMethod.Cod" />
+                                        <div>
+                                            <div class="fw-bold">Thanh toán khi nhận hàng (COD)</div>
+                                            <div class="text-muted small">Shipper thu tiền khi giao món. Hệ thống chỉ ghi nhận thanh toán sau khi giao thành công.</div>
+                                        </div>
+                                    </div>
+                                </label>
+
+                                <label class="payment-choice card border-2 rounded-4 p-3 @(Model.PaymentMethod == PaymentMethod.VnPay ? "border-primary" : "border-light")">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <input class="form-check-input mt-1" type="radio" asp-for="PaymentMethod" value="@PaymentMethod.VnPay" />
+                                        <div>
+                                            <div class="fw-bold">Thanh toán online qua VNPay</div>
+                                            <div class="text-muted small">Bạn sẽ được chuyển sang cổng thanh toán VNPay để hoàn tất giao dịch. Hỗ trợ ATM, thẻ quốc tế, QR Pay.</div>
+                                        </div>
+                                    </div>
+                                </label>
+
+                                <label class="payment-choice card border-2 rounded-4 p-3 @(Model.PaymentMethod == PaymentMethod.Momo ? "border-danger" : "border-light")">
+                                    <div class="d-flex align-items-start gap-3">
+                                        <input class="form-check-input mt-1" type="radio" asp-for="PaymentMethod" value="@PaymentMethod.Momo" />
+                                        <div>
+                                            <div class="fw-bold">Thanh toán qua Momo 🩷</div>
+                                            <div class="text-muted small">Thanh toán nhanh qua ví điện tử Momo. Hỗ trợ ATM nội địa và ví Momo.</div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            <span asp-validation-for="PaymentMethod" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex gap-3 flex-wrap">
+                            <button type="submit" id="btnConfirm" class="btn btn-success btn-lg rounded-pill px-4">
+                                Đặt hàng
+                            </button>
+                            <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-secondary btn-lg rounded-pill px-4">Quay lại giỏ hàng</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top:100px;">
+                <div class="card-body p-4 p-lg-5">
+                    <h3 class="h5 fw-bold mb-4">Tóm tắt thanh toán</h3>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Tiền món ăn</span>
+                        <span class="fw-semibold">@cartTotal.ToString("N0") đ</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Phí vận chuyển</span>
+                        <span class="fw-semibold text-success">Miễn phí</span>
+                    </div>
+                    <hr />
+                    <div class="d-flex justify-content-between align-items-end">
+                        <span class="fw-bold fs-5">Tổng cộng</span>
+                        <span class="fw-bold fs-3 text-success">@cartTotal.ToString("N0") đ</span>
+                    </div>
+                    <div class="alert alert-light border rounded-4 mt-4 mb-0 small">
+                        DayliFood hỗ trợ 3 phương thức thanh toán: <strong>COD</strong> (thu tiền khi giao), <strong>VNPay</strong> và <strong>Momo</strong> (thanh toán online ngay khi đặt hàng).
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .payment-choice { cursor: pointer; transition: all .2s ease; }
+    .payment-choice:hover { transform: translateY(-2px); box-shadow: 0 .5rem 1rem rgba(15, 23, 42, .08); }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('checkoutForm')?.addEventListener('submit', function() {
+            const btn = document.getElementById('btnConfirm');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang xử lý';
+        });
+    </script>
+}

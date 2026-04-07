@@ -1,0 +1,232 @@
+@using Daylifood.Models
+@{
+    ViewData["Title"] = "Phê duyệt đối tác";
+    var sellerApps = ViewBag.SellerApplications as List<SellerApplication> ?? new();
+    var shipperApps = ViewBag.ShipperApplications as List<ShipperApplication> ?? new();
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<div class="admin-wrapper py-4">
+    <div class="container-fluid px-lg-5">
+        
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-5 animate-fade-in">
+            <div>
+                <h1 class="fw-bold text-dark-blue mb-1">Hệ thống phê duyệt</h1>
+                <p class="text-muted small">Chào bạn! Hôm nay bạn có <span class="badge bg-soft-orange text-orange">@(sellerApps.Count + shipperApps.Count) đơn</span> cần xử lý.</p>
+            </div>
+            <div class="d-flex gap-3">
+                <div class="stat-pill">
+                    <span class="label">Sellers</span>
+                    <span class="value text-primary">@sellerApps.Count</span>
+                </div>
+                <div class="stat-pill">
+                    <span class="label">Shippers</span>
+                    <span class="value text-success">@shipperApps.Count</span>
+                </div>
+            </div>
+        </div>
+
+        <ul class="nav nav-pills-modern mb-4 animate-fade-in" id="approvalTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="seller-tab" data-bs-toggle="tab" data-bs-target="#seller" type="button">
+                    <i class="bi bi-shop-window me-2"></i>Người bán (Sellers)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="shipper-tab" data-bs-toggle="tab" data-bs-target="#shipper" type="button">
+                    <i class="bi bi-bicycle me-2"></i>Người giao hàng (Shippers)
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content animate-slide-up" id="approvalTabContent">
+            
+            <div class="tab-pane fade show active" id="seller" role="tabpanel">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">Đối tác / Email</th>
+                                    <th>Thông tin shop</th>
+                                    <th>Liên hệ</th>
+                                    <th>Mô tả</th>
+                                    <th>Ngày đăng ký</th>
+                                    <th class="text-center pe-4">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var a in sellerApps)
+                                {
+                                    <tr>
+                                        <td class="ps-4 py-3">
+                                            <div class="fw-bold text-dark">@a.ContactFullName</div>
+                                            <div class="small text-muted">@a.User.Email</div>
+                                        </td>
+                                        <td>
+                                            <div class="badge bg-soft-primary text-primary rounded-pill mb-1">@a.ShopName</div>
+                                            <div class="small text-truncate" style="max-width: 200px;">@a.ShopAddress</div>
+                                        </td>
+                                        <td>
+                                            <div class="small fw-semibold"><i class="bi bi-telephone-fill me-1"></i>@a.ShopPhone</div>
+                                        </td>
+                                        <td>
+                                            <span class="small text-secondary fst-italic">@(a.Description ?? "-")</span>
+                                        </td>
+                                        <td>
+                                            <div class="small">@a.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</div>
+                                            <div class="x-small text-muted">@a.CreatedAt.ToLocalTime().ToString("HH:mm")</div>
+                                        </td>
+                                        <td class="text-center pe-4">
+                                            <div class="d-flex justify-content-center gap-2">
+                                                <form asp-action="ApproveSeller" method="post" onsubmit="return confirmApproval('Người bán này')">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@a.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-emerald shadow-sm">Duyệt</button>
+                                                </form>
+                                                <form asp-action="RejectSeller" method="post" onsubmit="return confirmReject('Người bán này')">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@a.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Từ chối</button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                                @if (!sellerApps.Any())
+                                {
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5 text-muted">
+                                            <i class="bi bi-inbox display-4 d-block mb-2 opacity-25"></i>
+                                            Hiện không có đơn đăng ký Người bán nào đang chờ.
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="shipper" role="tabpanel">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">Tài khoản</th>
+                                    <th>Khu vực hoạt động</th>
+                                    <th>Phương tiện</th>
+                                    <th>Biển số xe</th>
+                                    <th>Ngày đăng ký</th>
+                                    <th class="text-center pe-4">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var a in shipperApps)
+                                {
+                                    <tr>
+                                        <td class="ps-4 py-3">
+                                            <div class="fw-bold">@a.User.Email</div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-soft-success text-success"><i class="bi bi-geo-alt me-1"></i>@a.DeliveryArea.Name</span>
+                                        </td>
+                                        <td>
+                                            <span class="small fw-600">@a.VehicleType</span>
+                                        </td>
+                                        <td>
+                                            <code class="px-2 py-1 bg-light border rounded">@a.LicensePlate</code>
+                                        </td>
+                                        <td>
+                                            <div class="small">@a.CreatedAt.ToLocalTime().ToString("g")</div>
+                                        </td>
+                                        <td class="text-center pe-4">
+                                            <div class="d-flex justify-content-center gap-2">
+                                                <form asp-action="ApproveShipper" method="post" onsubmit="return confirmApproval('Shipper này')">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@a.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-emerald shadow-sm">Duyệt</button>
+                                                </form>
+                                                <form asp-action="RejectShipper" method="post" onsubmit="return confirmReject('Shipper này')">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@a.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">Từ chối</button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                                @if (!shipperApps.Any())
+                                {
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5 text-muted">
+                                            <i class="bi bi-bicycle display-4 d-block mb-2 opacity-25"></i>
+                                            Hiện không có đơn đăng ký Shipper nào đang chờ.
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --emerald: #10b981;
+        --dark-blue: #1e293b;
+        --soft-orange: #fff1ed;
+        --orange: #ff7e5f;
+    }
+
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+    .text-dark-blue { color: var(--dark-blue); }
+    .text-orange { color: var(--orange); }
+    .bg-soft-orange { background-color: var(--soft-orange); }
+    .bg-soft-primary { background-color: #e0f2fe; }
+    .bg-soft-success { background-color: #dcfce7; }
+    .fw-600 { font-weight: 600; }
+
+    /* Stat Pills */
+    .stat-pill { background: white; padding: 10px 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; display: flex; flex-direction: column; }
+    .stat-pill .label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #94a3b8; }
+    .stat-pill .value { font-size: 1.2rem; font-weight: 800; }
+
+    /* Tabs Modern */
+    .nav-pills-modern { gap: 10px; }
+    .nav-pills-modern .nav-link { 
+        border-radius: 12px; color: #64748b; font-weight: 600; padding: 12px 24px; 
+        transition: all 0.3s ease; background: white; border: 1px solid #e2e8f0;
+    }
+    .nav-pills-modern .nav-link.active { background: var(--dark-blue); color: white; border-color: var(--dark-blue); }
+
+    /* Table & Buttons */
+    .table thead th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; color: #64748b; padding: 15px; border-bottom: none; }
+    .btn-emerald { background-color: var(--emerald); color: white; border: none; padding: 6px 16px; border-radius: 8px; font-weight: 600; }
+    .btn-emerald:hover { background-color: #059669; color: white; }
+    .btn-outline-danger { border-radius: 8px; font-weight: 600; border-width: 1.5px; }
+
+    .x-small { font-size: 0.7rem; }
+    
+    /* Animations */
+    @@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-slide-up { animation: fadeInUp 0.5s ease-out both; }
+    .animate-fade-in { animation: fadeInUp 0.4s ease-out both; }
+</style>
+
+@section Scripts {
+    <script>
+        function confirmApproval(target) {
+            return confirm(`Bạn có chắc chắn muốn PHÊ DUYỆT cho ${target} chứ?`);
+        }
+        function confirmReject(target) {
+            return confirm(`Cảnh báo: Bạn sẽ TỪ CHỐI đơn của ${target}. Tiếp tục?`);
+        }
+    </script>
+}

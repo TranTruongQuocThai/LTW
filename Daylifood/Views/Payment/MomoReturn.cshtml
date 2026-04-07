@@ -1,0 +1,78 @@
+@model Daylifood.ViewModels.MomoReturnViewModel
+@{
+    ViewData["Title"] = Model.Callback.IsSuccess ? "Thanh toán thành công" : "Thanh toán thất bại";
+    var isSuccess = Model.Callback.IsSuccess && Model.Callback.IsSignatureValid;
+}
+
+<div class="container py-5" style="max-width: 600px;">
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        @if (isSuccess)
+        {
+            <div class="card-header border-0 py-4 text-center" style="background: linear-gradient(135deg, #a8e6cf, #56ab2f);">
+                <div class="mb-2" style="font-size: 3.5rem;">✅</div>
+                <h2 class="fw-bold text-white mb-1">Thanh toán thành công!</h2>
+                <p class="text-white opacity-75 mb-0">DayliFood đã nhận được khoản thanh toán của bạn</p>
+            </div>
+        }
+        else
+        {
+            <div class="card-header border-0 py-4 text-center" style="background: linear-gradient(135deg, #ffb3b3, #e74c3c);">
+                <div class="mb-2" style="font-size: 3.5rem;">❌</div>
+                <h2 class="fw-bold text-white mb-1">Thanh toán thất bại</h2>
+                <p class="text-white opacity-75 mb-0">Giao dịch không được xác nhận từ Momo</p>
+            </div>
+        }
+
+        <div class="card-body p-4">
+            @if (Model.Order != null)
+            {
+                <h6 class="text-muted text-uppercase fw-bold mb-3" style="font-size: 0.7rem; letter-spacing: 1px;">Thông tin đơn hàng</h6>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Mã đơn hàng</span>
+                    <strong>#@Model.Order.Id</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Tổng tiền</span>
+                    <strong class="text-success">@Model.Order.TotalPrice.ToString("N0") đ</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Khu vực giao</span>
+                    <span>@Model.Order.DeliveryArea?.Name</span>
+                </div>
+                <div class="d-flex justify-content-between mb-4">
+                    <span class="text-muted">Trạng thái thanh toán</span>
+                    <span class="badge @(isSuccess ? "bg-success" : "bg-danger") rounded-pill">
+                        @(isSuccess ? "Đã thanh toán" : "Thất bại")
+                    </span>
+                </div>
+            }
+
+            @if (!isSuccess && !string.IsNullOrWhiteSpace(Model.Callback.Message))
+            {
+                <div class="alert alert-warning border-0 rounded-3 mb-4">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>Lý do:</strong> @Model.Callback.Message (Mã: @Model.Callback.ResultCode)
+                </div>
+            }
+
+            <div class="d-grid gap-2">
+                @if (isSuccess)
+                {
+                    <a asp-controller="Order" asp-action="History" class="btn btn-success rounded-3 py-2 fw-bold">
+                        <i class="bi bi-clock-history me-2"></i>Xem lịch sử đơn hàng
+                    </a>
+                }
+                else if (Model.Order != null)
+                {
+                    <a asp-controller="Payment" asp-action="CreateMomoPayment" asp-route-orderId="@Model.Order.Id"
+                       class="btn btn-warning rounded-3 py-2 fw-bold">
+                        <i class="bi bi-arrow-repeat me-2"></i>Thử lại thanh toán Momo
+                    </a>
+                }
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary rounded-3 py-2">
+                    <i class="bi bi-house me-2"></i>Về trang chủ
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

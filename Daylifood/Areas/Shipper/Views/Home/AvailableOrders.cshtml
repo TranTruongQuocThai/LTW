@@ -1,0 +1,199 @@
+@model List<Daylifood.Models.Order>
+@using Daylifood.Models
+@{
+    ViewData["Title"] = "Đơn hàng sẵn sàng giao";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Lexend:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<div class="shipper-terminal-wrapper py-4">
+    <div class="container">
+        
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-5 animate-fade-in">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2">
+                        <li class="breadcrumb-item"><a asp-area="Shipper" asp-controller="Home" asp-action="Index" class="text-decoration-none text-muted">Bảng điều khiển</a></li>
+                        <li class="breadcrumb-item active fw-bold text-emerald" aria-current="page">Sảnh chờ đơn</li>
+                    </ol>
+                </nav>
+                <h1 class="fw-bold text-dark-blue family-lexend mb-0">Đơn giao trong khu vực</h1>
+                <p class="text-muted small">Bạn ơi, đang có <span class="badge bg-soft-emerald text-emerald">@Model.Count đơn</span> sẵn sàng để giao!</p>
+            </div>
+            
+            <div class="d-none d-md-block">
+                <div class="status-pill-online shadow-sm">
+                    <span class="dot-blink me-2"></span> Đang trực tuyến
+                </div>
+            </div>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="empty-state-shipper text-center py-5 rounded-5 bg-white shadow-sm border border-dashed animate-up">
+                <div class="illustration-box mb-4">
+                    <i class="bi bi-bicycle text-muted opacity-25" style="font-size: 6rem;"></i>
+                </div>
+                <h4 class="fw-bold text-dark-blue">Sảnh chờ đang trống...</h4>
+                <p class="text-muted px-4">Hiện không có đơn nào cần giao trong khu vực của bạn. Đơn sẽ hiện ở đây ngay sau khi chủ quán xác nhận chuẩn bị món xong!</p>
+                <button onclick="location.reload()" class="btn btn-outline-emerald rounded-pill px-4 mt-2 fw-bold">
+                    <i class="bi bi-arrow-clockwise me-1"></i> Làm mới sảnh
+                </button>
+            </div>
+        }
+        else
+        {
+            <div class="order-terminal-grid">
+                @foreach (var o in Model.OrderByDescending(x => x.CreatedAt))
+                {
+                    <div class="order-flash-card mb-4 animate-up shadow-sm">
+                        <div class="profit-indicator"></div>
+                        
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="id-badge me-3">#@o.Id</div>
+                                    <div>
+                                        <div class="x-small text-muted fw-bold text-uppercase">Thời điểm đặt</div>
+                                        <div class="small fw-600">@o.CreatedAt.ToLocalTime().ToString("HH:mm") — @o.CreatedAt.ToLocalTime().ToString("dd/MM")</div>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <div class="price-highlight">@o.TotalPrice.ToString("N0") <small>đ</small></div>
+                                    <span class="badge bg-soft-primary text-primary x-small rounded-pill px-3">Thanh toán tiền mặt</span>
+                                </div>
+                            </div>
+
+                            <hr class="opacity-5 my-4">
+
+                            <div class="row g-4 mb-4">
+                                <div class="col-md-6 border-end-md">
+                                    <div class="delivery-route">
+                                        <div class="route-step mb-3">
+                                            <i class="bi bi-shop-window text-orange me-3 fs-5"></i>
+                                            <div>
+                                                <div class="x-small text-muted fw-bold">ĐIỂM LẤY HÀNG</div>
+                                                <div class="fw-bold text-dark-blue small">Cửa hàng đối tác DayliFood</div>
+                                            </div>
+                                        </div>
+                                        <div class="route-step">
+                                            <i class="bi bi-geo-alt-fill text-danger me-3 fs-5"></i>
+                                            <div>
+                                                <div class="x-small text-muted fw-bold">ĐIỂM GIAO ĐẾN</div>
+                                                <div class="fw-bold text-dark-blue small">@o.DeliveryArea.Name</div>
+                                                <div class="x-small text-muted italic line-clamp-1">@o.DeliveryAddress</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="item-summary p-3 rounded-4 bg-light-soft h-100">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-box-seam text-primary me-2"></i>
+                                            <span class="fw-bold small text-dark-blue">CHI TIẾT MÓN (@o.OrderItems.Count)</span>
+                                        </div>
+                                        <div class="small text-muted">
+                                            @string.Join(", ", o.OrderItems.Select(i => i.Product.Name + " x" + i.Quantity))
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                                <a asp-action="OrderDetail" asp-route-id="@o.Id" class="btn btn-detail-shipper fw-bold">
+                                    XEM CHI TIẾT <i class="bi bi-chevron-right ms-1"></i>
+                                </a>
+                                
+                                <form asp-action="AcceptOrder" method="post" onsubmit="return confirmAccept('@o.Id', '@o.TotalPrice.ToString("N0")')">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@o.Id" />
+                                    <button type="submit" class="btn btn-accept-order px-5 py-3 rounded-pill fw-800 shadow-emerald animate-pulse">
+                                        NHẬN ĐƠN NGAY <i class="bi bi-check-circle-fill ms-2"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    :root {
+        --dark-blue: #0f172a;
+        --emerald: #10b981;
+        --emerald-dark: #059669;
+        --orange: #ff7e5f;
+        --soft-emerald: #ecfdf5;
+        --soft-primary: #eff6ff;
+    }
+
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+    .family-lexend { font-family: 'Lexend', sans-serif; }
+    .fw-800 { font-weight: 800; }
+    .fw-600 { font-weight: 600; }
+    .text-emerald { color: var(--emerald); }
+
+    /* Header Online Pill */
+    .status-pill-online { background: white; padding: 10px 25px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; color: var(--dark-blue); border: 1px solid #e2e8f0; display: flex; align-items: center; }
+    .dot-blink { width: 10px; height: 10px; background: var(--emerald); border-radius: 50%; box-shadow: 0 0 10px var(--emerald); animation: blink-status 1.5s infinite; }
+    @@keyframes blink-status { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.2); } 100% { opacity: 1; transform: scale(1); } }
+
+    /* Order Flash Card */
+    .order-flash-card { background: white; border: none; border-radius: 35px; position: relative; overflow: hidden; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .order-flash-card:hover { transform: translateY(-8px); box-shadow: 0 25px 50px -12px rgba(0,0,0,0.08) !important; }
+    
+    .profit-indicator { position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background: linear-gradient(to bottom, var(--emerald), #34d399); }
+
+    .id-badge { background: var(--dark-blue); color: white; padding: 12px 18px; border-radius: 18px; font-weight: 800; font-size: 1.1rem; }
+    .price-highlight { font-size: 1.8rem; font-weight: 800; color: var(--emerald-dark); line-height: 1; margin-bottom: 5px; }
+
+    /* Route Steps */
+    .route-step { display: flex; align-items: flex-start; }
+    .line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+
+    /* Buttons */
+    .btn-detail-shipper { color: #64748b; font-size: 0.85rem; letter-spacing: 1px; transition: 0.3s; padding: 0; }
+    .btn-detail-shipper:hover { color: var(--dark-blue); transform: translateX(5px); }
+
+    .btn-accept-order { background: linear-gradient(45deg, var(--emerald), #34d399); color: white; border: none; font-size: 1.1rem; transition: all 0.3s; }
+    .btn-accept-order:hover { transform: scale(1.05); box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3); color: white; }
+
+    .shadow-emerald { box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2); }
+    .btn-outline-emerald { border: 2px solid var(--emerald); color: var(--emerald); transition: 0.3s; }
+    .btn-outline-emerald:hover { background: var(--emerald); color: white; }
+
+    /* Pulse for New Orders */
+    .animate-pulse { animation: pulse-emerald-btn 2s infinite; }
+    @@keyframes pulse-emerald-btn { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+
+    /* Responsive */
+    @@media (min-width: 768px) { .border-end-md { border-right: 1px solid #f1f5f9; } }
+    .bg-light-soft { background-color: #f8fafc; }
+    .bg-soft-emerald { background-color: var(--soft-emerald); }
+    .bg-soft-primary { background-color: var(--soft-primary); }
+
+    /* Animations */
+    @@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-up { animation: fadeInUp 0.7s ease-out both; }
+    .animate-fade-in { animation: fadeInUp 0.4s ease-out both; }
+    .x-small { font-size: 0.7rem; }
+    .italic { font-style: italic; }
+</style>
+
+@section Scripts {
+    <script>
+        function confirmAccept(id, price) {
+            return confirm(`Bác tài ơi! Xác nhận NHẬN ĐƠN #${id} với tổng tiền ${price}đ chứ? Chúc bạn vạn dặm bình an!`);
+        }
+
+        // Tự động reload trang mỗi 30 giây để cập nhật đơn mới cho Shipper
+        setTimeout(function(){
+           window.location.reload();
+        }, 30000);
+    </script>
+}

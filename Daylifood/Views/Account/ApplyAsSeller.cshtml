@@ -1,0 +1,276 @@
+@model ApplySellerViewModel
+@{
+    ViewData["Title"] = "Gia nhập đại gia đình Daylifood";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&family=Pacifico&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<div class="food-app-bg py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-9">
+                <div class="main-card shadow-2xl border-0 rounded-5 overflow-hidden bg-white">
+                    <div class="row g-0">
+                        <div class="col-md-5 d-none d-md-block position-relative side-banner">
+                            <div class="overlay-gradient"></div>
+                            <div class="banner-content p-5 text-white h-100 d-flex flex-column justify-content-between">
+                                <div class="logo-area">
+                                    <h2 class="brand-font text-warning mb-0">Daylifood</h2>
+                                    <small class="text-light opacity-75">Đối tác tin cậy - Vươn tầm vị thế</small>
+                                </div>
+                                
+                                <div class="quote-area">
+                                    <h3 class="fw-bold mb-3">Biến đam mê thành lợi nhuận</h3>
+                                    <p class="small fw-light">Hàng ngàn đơn hàng đang chờ đợi bàn tay khéo léo của bạn. Hãy để Daylifood kể câu chuyện về món ăn của bạn.</p>
+                                    
+                                    <div class="features-list mt-4">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-check-circle-fill text-warning me-2"></i>
+                                            <span class="small">Chiết khấu thấp nhất thị trường</span>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-check-circle-fill text-warning me-2"></i>
+                                            <span class="small">Hỗ trợ Marketing chuyên nghiệp</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-7 p-4 p-md-5">
+                            <div class="form-header mb-4">
+                                <span class="badge rounded-pill bg-warning-light text-warning px-3 py-2 mb-2">DÀNH CHO ĐỐI TÁC</span>
+                                <h2 class="fw-bold text-dark-blue mb-1">Mở quán cùng Daylifood</h2>
+                                <p class="text-muted small">Chỉ mất 2 phút để hoàn tất hồ sơ đăng ký.</p>
+                            </div>
+
+                            <form asp-action="ApplyAsSeller" method="post" id="registrationForm">
+                                @Html.AntiForgeryToken()
+                                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small border-0 rounded-3"></div>
+
+                                <div class="row">
+                                    <div class="col-12 mb-3">
+                                        <div class="input-group-custom">
+                                            <label asp-for="ContactFullName" class="form-label small fw-bold">HỌ TÊN CHỦ QUÁN</label>
+                                            <div class="input-wrapper">
+                                                <i class="bi bi-person-badge"></i>
+                                                <input asp-for="ContactFullName" class="custom-input" placeholder="Nguyễn Văn A" />
+                                            </div>
+                                            <span asp-validation-for="ContactFullName" class="text-danger x-small"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 mb-3">
+                                        <div class="input-group-custom">
+                                            <label asp-for="ShopName" class="form-label small fw-bold">TÊN TIỆM CỦA BẠN</label>
+                                            <div class="input-wrapper">
+                                                <i class="bi bi-shop"></i>
+                                                <input asp-for="ShopName" class="custom-input" placeholder="VD: Bún Đậu Mắm Tôm Phố Cổ" />
+                                            </div>
+                                            <span asp-validation-for="ShopName" class="text-danger x-small"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 mb-3">
+                                        <div class="input-group-custom">
+                                            <label asp-for="ShopPhone" class="form-label small fw-bold">SỐ ĐIỆN THOẠI</label>
+                                            <div class="input-wrapper">
+                                                <i class="bi bi-phone-vibrate"></i>
+                                                <input asp-for="ShopPhone" class="custom-input" placeholder="09xx xxx xxx" />
+                                            </div>
+                                            <span asp-validation-for="ShopPhone" class="text-danger x-small"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 mb-3">
+                                        <div class="input-group-custom">
+                                            <label asp-for="ShopAddress" class="form-label small fw-bold">ĐỊA CHỈ KINH DOANH</label>
+                                            <div class="input-wrapper">
+                                                <i class="bi bi-geo-alt"></i>
+                                                <input asp-for="ShopAddress" class="custom-input" placeholder="Số nhà, Tên đường, Quận/Huyện..." />
+                                            </div>
+                                            <span asp-validation-for="ShopAddress" class="text-danger x-small"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 mb-4">
+                                        <div class="input-group-custom">
+                                            <label asp-for="Description" class="form-label small fw-bold">GIỚI THIỆU QUÁN</label>
+                                            <textarea asp-for="Description" class="custom-textarea" rows="3" placeholder="Chia sẻ một chút về món ăn đặc sắc của bạn..."></textarea>
+                                            <div class="text-end mt-1">
+                                                <small id="charCount" class="text-muted x-small">0/500 ký tự</small>
+                                            </div>
+                                            <span asp-validation-for="Description" class="text-danger x-small"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-grid gap-3">
+                                    <button type="submit" class="btn btn-food-primary py-3 rounded-4 shadow-orange">
+                                        GỬI ĐƠN XÉT DUYỆT NGAY <i class="bi bi-send-fill ms-2"></i>
+                                    </button>
+                                    <a asp-action="Profile" class="btn btn-light-soft py-2 rounded-4 fw-semibold text-secondary small">
+                                        <i class="bi bi-arrow-left me-1"></i> Quay lại hồ sơ
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --food-orange: #ff7043;
+        --food-yellow: #ffb300;
+        --soft-bg: #fff8f1;
+        --dark-blue: #1e293b;
+    }
+
+    body {
+        background-color: #fcfcfc;
+        font-family: 'Lexend', sans-serif;
+    }
+
+    .brand-font { font-family: 'Pacifico', cursive; }
+    .text-dark-blue { color: var(--dark-blue); }
+    .bg-warning-light { background: rgba(255, 179, 0, 0.1); }
+    .x-small { font-size: 0.75rem; }
+
+    /* Background pattern giống khăn trải bàn hiện đại */
+    .food-app-bg {
+        background-color: var(--soft-bg);
+        background-image: radial-gradient(var(--food-orange) 0.5px, transparent 0.5px);
+        background-size: 30px 30px;
+        min-height: 100vh;
+    }
+
+    .main-card {
+        box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+        border-radius: 40px !important;
+    }
+
+    /* Banner trái: Sử dụng hình ảnh món ăn chất lượng cao */
+    .side-banner {
+        background: url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80') center/cover;
+    }
+
+    .overlay-gradient {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(255, 112, 67, 0.8));
+    }
+
+    .banner-content { position: relative; z-index: 2; }
+
+    /* Custom Inputs - Style hiện đại không viền */
+    .input-group-custom { position: relative; }
+    
+    .input-wrapper {
+        display: flex;
+        align-items: center;
+        background: #f8fafc;
+        border: 2px solid transparent;
+        border-radius: 15px;
+        padding: 5px 15px;
+        transition: all 0.3s;
+    }
+
+    .input-wrapper i { color: #94a3b8; font-size: 1.1rem; }
+
+    .custom-input {
+        background: transparent;
+        border: none;
+        padding: 10px;
+        width: 100%;
+        font-size: 0.95rem;
+        outline: none;
+    }
+
+    .custom-textarea {
+        background: #f8fafc;
+        border: 2px solid transparent;
+        border-radius: 15px;
+        padding: 15px;
+        width: 100%;
+        outline: none;
+        transition: all 0.3s;
+    }
+
+    .input-wrapper:focus-within, .custom-textarea:focus {
+        background: #fff;
+        border-color: var(--food-orange);
+        box-shadow: 0 5px 15px rgba(255, 112, 67, 0.1);
+    }
+
+    /* Button "ngon" hơn */
+    .btn-food-primary {
+        background: linear-gradient(45deg, var(--food-orange), #ff9100);
+        border: none;
+        color: white;
+        font-weight: 700;
+        letter-spacing: 1px;
+        transition: all 0.3s;
+    }
+
+    .btn-food-primary:hover {
+        transform: scale(1.03);
+        background: linear-gradient(45deg, #ff9100, var(--food-orange));
+        box-shadow: 0 10px 25px rgba(255, 112, 67, 0.4);
+    }
+
+    .btn-light-soft {
+        background: #f1f5f9;
+        border: none;
+    }
+
+    /* Animation */
+    @@keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .main-card {
+        animation: fadeInUp 0.6s ease-out;
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const textarea = document.querySelector('.custom-textarea');
+            const charCount = document.getElementById('charCount');
+
+            // 1. Bộ đếm ký tự cho phần giới thiệu
+            textarea.addEventListener('input', function() {
+                const len = this.value.length;
+                charCount.textContent = `${len}/500 ký tự`;
+                if(len > 450) charCount.classList.replace('text-muted', 'text-danger');
+                else charCount.classList.replace('text-danger', 'text-muted');
+            });
+
+            // 2. Hiệu ứng "Floating Label" giả lập và làm sạch input
+            const inputs = document.querySelectorAll('.custom-input');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.parentElement.querySelector('i').style.color = 'var(--food-orange)';
+                });
+                input.addEventListener('blur', function() {
+                    this.parentElement.querySelector('i').style.color = '#94a3b8';
+                });
+            });
+
+            // 3. Confetti nhẹ khi nhấn submit (nếu valid)
+            const form = document.getElementById('registrationForm');
+            form.addEventListener('submit', function(e) {
+                // Bạn có thể thêm logic kiểm tra validation ở đây trước khi bắn hiệu ứng
+                console.log("Đơn đang được gửi đi...");
+            });
+        });
+    </script>
+}

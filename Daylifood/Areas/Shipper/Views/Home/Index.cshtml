@@ -1,0 +1,211 @@
+@using Daylifood.Models
+@{
+    ViewData["Title"] = "Bảng điều khiển Shipper";
+    var profile = ViewBag.Profile as ShipperProfile;
+    var available = (int)ViewBag.AvailableCount;
+    var delivering = (int)ViewBag.DeliveringCount;
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Lexend:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<div class="shipper-dashboard-wrapper py-4">
+    <div class="container">
+        
+        <div class="profile-hero-card p-4 p-md-5 rounded-5 shadow-sm mb-5 text-white animate-fade-in">
+            <div class="row align-items-center">
+                <div class="col-md-8 d-flex align-items-center">
+                    <div class="shipper-avatar-large me-4 shadow-lg">
+                        <i class="bi bi-person-badge"></i>
+                    </div>
+                    <div>
+                        <span class="badge rounded-pill bg-white text-emerald px-3 py-1 mb-2 fw-bold small">ĐANG TRỰC TUYẾN</span>
+                        <h1 class="display-6 fw-800 family-lexend mb-1">Chào bác tài!</h1>
+                        @if (profile != null)
+                        {
+                            <p class="mb-0 opacity-80">
+                                <i class="bi bi-geo-alt-fill me-1"></i> Khu vực: <strong>@profile.DeliveryArea.Name</strong> 
+                                <span class="mx-2">|</span>
+                                <i class="bi bi-truck me-1"></i> @profile.VehicleType (@profile.LicensePlate)
+                            </p>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-4 text-md-end mt-4 mt-md-0">
+                    <div class="time-pill shadow-sm">
+                        <i class="bi bi-clock-history me-2"></i> <span id="realtime-clock">00:00:00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-6 animate-up" style="animation-delay: 0.1s">
+                <div class="stat-card-glass h-100">
+                    <div class="card-body p-4 d-flex align-items-center">
+                        <div class="stat-icon-box bg-soft-emerald text-emerald me-4">
+                            <i class="bi bi-lightning-charge-fill"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="text-muted fw-bold small ls-1 mb-1">ĐƠN CÓ THỂ NHẬN</h6>
+                            <h2 class="display-5 fw-800 text-dark-blue mb-0">@available</h2>
+                        </div>
+                        <a asp-area="Shipper" asp-controller="Home" asp-action="AvailableOrders" class="btn btn-action-round">
+                            <i class="bi bi-arrow-right-short"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 animate-up" style="animation-delay: 0.2s">
+                <div class="stat-card-glass h-100 border-primary-soft">
+                    <div class="card-body p-4 d-flex align-items-center">
+                        <div class="stat-icon-box bg-soft-primary text-primary me-4">
+                            <i class="bi bi-bicycle"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="text-muted fw-bold small ls-1 mb-1">ĐƠN ĐANG GIAO</h6>
+                            <h2 class="display-5 fw-800 text-dark-blue mb-0">@delivering</h2>
+                        </div>
+                        <a asp-area="Shipper" asp-controller="Home" asp-action="MyDeliveries" class="btn btn-action-round bg-primary text-white">
+                            <i class="bi bi-box-seam"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-nav-section animate-slide-up">
+            <h5 class="fw-bold text-dark-blue mb-4">Thao tác nhanh cho bạn</h5>
+            <div class="row g-3">
+                <div class="col-6 col-md-3">
+                    <a asp-area="Shipper" asp-controller="Home" asp-action="AvailableOrders" class="quick-pill-btn shadow-sm">
+                        <i class="bi bi-search"></i> Sảnh tìm đơn
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a asp-area="Shipper" asp-controller="Home" asp-action="MyDeliveries" class="quick-pill-btn shadow-sm">
+                        <i class="bi bi-geo"></i> Lộ trình giao
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="#" class="quick-pill-btn shadow-sm">
+                        <i class="bi bi-wallet2"></i> Thu nhập
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="#" class="quick-pill-btn shadow-sm">
+                        <i class="bi bi-star"></i> Đánh giá
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --emerald: #10b981;
+        --emerald-dark: #065f46;
+        --dark-blue: #0f172a;
+        --soft-emerald: #ecfdf5;
+        --soft-primary: #eff6ff;
+        --bg-dashboard: #f8fafc;
+    }
+
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dashboard); }
+    .family-lexend { font-family: 'Lexend', sans-serif; }
+    .fw-800 { font-weight: 800; }
+    .text-emerald { color: var(--emerald); }
+    .text-dark-blue { color: var(--dark-blue); }
+    .ls-1 { letter-spacing: 1px; }
+
+    /* Profile Hero Card */
+    .profile-hero-card {
+        background: linear-gradient(135deg, var(--emerald-dark) 0%, var(--emerald) 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    .shipper-avatar-large {
+        width: 80px; height: 80px;
+        background: rgba(255,255,255,0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 25px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 2.5rem; color: white;
+    }
+    .time-pill {
+        background: rgba(0,0,0,0.2);
+        padding: 10px 20px; border-radius: 50px;
+        font-weight: 700; font-size: 0.9rem;
+        display: inline-block;
+    }
+
+    /* Stat Cards Glassmorphism */
+    .stat-card-glass {
+        background: white;
+        border: 1px solid #f1f5f9;
+        border-radius: 35px;
+        transition: all 0.3s ease;
+    }
+    .stat-card-glass:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.04) !important;
+    }
+    .stat-icon-box {
+        width: 65px; height: 65px;
+        border-radius: 20px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.8rem;
+    }
+    .bg-soft-emerald { background: var(--soft-emerald); }
+    .bg-soft-primary { background: var(--soft-primary); }
+
+    .btn-action-round {
+        width: 45px; height: 45px;
+        border-radius: 50%;
+        background: #f1f5f9;
+        color: var(--dark-blue);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+    .btn-action-round:hover { background: var(--dark-blue); color: white; }
+
+    /* Quick Nav Pills */
+    .quick-pill-btn {
+        background: white; padding: 18px;
+        border-radius: 22px;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        text-decoration: none; color: var(--dark-blue);
+        font-weight: 700; font-size: 0.9rem;
+        gap: 8px; border: 1.5px solid transparent;
+        transition: 0.3s;
+    }
+    .quick-pill-btn i { font-size: 1.4rem; color: var(--emerald); }
+    .quick-pill-btn:hover {
+        border-color: var(--emerald);
+        background: var(--soft-emerald);
+        transform: scale(1.05);
+    }
+
+    /* Animations */
+    @@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-up { animation: fadeInUp 0.7s ease-out both; }
+    .animate-slide-up { animation: fadeInUp 0.6s ease-out both; }
+    .animate-fade-in { animation: fadeInUp 0.4s ease-out both; }
+</style>
+
+@section Scripts {
+    <script>
+        // Đồng hồ thời gian thực cho bác tài
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('vi-VN', { hour12: false });
+            document.getElementById('realtime-clock').innerText = timeStr;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
+}

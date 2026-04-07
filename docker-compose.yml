@@ -1,0 +1,57 @@
+services:
+  # ── SQL Server 2022 ──────────────────────────────────────────────────────
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: daylifood_db
+    environment:
+      SA_PASSWORD: "Daylifood@2026"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Express"
+    ports:
+      - "1433:1433"
+    volumes:
+      - daylifood_db_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Daylifood@2026' -Q 'SELECT 1' -C -b -o /dev/null || exit 1"]
+      interval: 10s
+      retries: 10
+      start_period: 30s
+      timeout: 5s
+
+  # ── ASP.NET Core App ─────────────────────────────────────────────────────
+  app:
+    build:
+      context: ./Daylifood
+      dockerfile: Dockerfile
+    container_name: daylifood_app
+    ports:
+      - "5174:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Development"
+      # Override connection string — trỏ vào service db trong cùng network
+      ConnectionStrings__DefaultConnection: "Server=db,1433;Database=DaylifoodDb;User Id=sa;Password=Daylifood@2026;TrustServerCertificate=True;MultipleActiveResultSets=true"
+      # Gemini (OpenAI-compatible endpoint)
+      OpenAI__ApiKey: "${OPENAI_API_KEY:-}"
+      OpenAI__BaseUrl: "${OPENAI_BASE_URL:-https://generativelanguage.googleapis.com/v1beta/openai/}"
+      OpenAI__Model: "${OPENAI_MODEL:-gemini-2.5-flash}"
+      # VNPay Sandbox (real credentials)
+      VnPay__BaseUrl: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+      VnPay__TmnCode: "${VNPAY_TMN_CODE:-ZDFZQ69K}"
+      VnPay__HashSecret: "${VNPAY_HASH_SECRET:-GPJ10UEZTC8IJODE9T5O5QSADE42TVQ5}"
+      VnPay__ReturnUrl: "http://localhost:5174/Payment/VnPayReturn"
+      VnPay__IpnUrl: "${VNPAY_IPN_URL:-}"
+      # Momo sandbox
+      Momo__PartnerCode: "${MOMO_PARTNER_CODE:-MOMO}"
+      Momo__AccessKey: "${MOMO_ACCESS_KEY:-F8BBA842ECF85}"
+      Momo__SecretKey: "${MOMO_SECRET_KEY:-K951B6PE1waDMi640xX08PD3vg6EkVlz}"
+      Momo__RequestType: "${MOMO_REQUEST_TYPE:-captureWallet}"
+      Momo__ReturnUrl: "http://localhost:5174/Payment/MomoReturn"
+      Momo__IpnUrl: "${MOMO_IPN_URL:-}"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure
+
+volumes:
+  daylifood_db_data:
+    driver: local

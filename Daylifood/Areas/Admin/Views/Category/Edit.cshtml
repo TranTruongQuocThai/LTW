@@ -1,0 +1,153 @@
+@model Daylifood.Models.Category
+@{
+    ViewData["Title"] = "Chỉnh sửa danh mục";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<div class="admin-container py-5">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-4 animate-fade-in">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none text-muted">Quản lý danh mục</a></li>
+                <li class="breadcrumb-item active fw-bold text-orange" aria-current="page">Chỉnh sửa</li>
+            </ol>
+        </nav>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+                <div class="edit-card shadow-2xl border-0 rounded-5 overflow-hidden animate-slide-up">
+                    <div class="card-header-edit p-4 text-center">
+                        <div class="icon-circle-edit mb-3 mx-auto">
+                            <i class="bi bi-pencil-square"></i>
+                        </div>
+                        <h2 class="fw-bold text-dark-blue family-comfortaa mb-1">Cập nhật danh mục</h2>
+                        <p class="text-muted small">Bạn đang chỉnh sửa mã định danh: <span class="badge bg-light text-dark border">#@Model.Id</span></p>
+                    </div>
+
+                    <div class="card-body p-4 p-md-5 bg-white">
+                        <form asp-action="Edit" method="post" id="editCategoryForm">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="Id" />
+                            
+                            <div asp-validation-summary="ModelOnly" class="alert alert-soft-danger py-2 small border-0 rounded-3 mb-4"></div>
+
+                            <div class="form-group-modern mb-4">
+                                <label asp-for="Name" class="label-modern">TÊN DANH MỤC MỚI</label>
+                                <div class="input-wrapper">
+                                    <i class="bi bi-tag"></i>
+                                    <input asp-for="Name" class="input-modern" placeholder="Cập nhật tên danh mục..." autocomplete="off" />
+                                </div>
+                                <span asp-validation-for="Name" class="text-danger-custom"></span>
+                            </div>
+
+                            <div class="d-grid gap-3 mt-5">
+                                <button type="submit" class="btn btn-save-gradient py-3 fw-bold rounded-pill shadow-orange">
+                                    CẬP NHẬT NGAY <i class="bi bi-arrow-right-short ms-1"></i>
+                                </button>
+                                <a asp-action="Index" class="btn btn-light-modern py-3 fw-bold rounded-pill text-decoration-none text-center">
+                                    Hủy thay đổi
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-3 rounded-4 bg-soft-blue border-dashed-blue animate-fade-in" style="animation-delay: 0.2s;">
+                    <div class="d-flex align-items-start">
+                        <i class="bi bi-info-circle-fill text-primary me-2 mt-1"></i>
+                        <p class="small text-muted mb-0">
+                            <strong>Lưu ý:</strong> Việc đổi tên danh mục sẽ ảnh hưởng đến hiển thị của toàn bộ món ăn thuộc danh mục này trên trang chủ. Bạn kiểm tra kỹ nhé!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --food-orange: #ff7e5f;
+        --food-red: #ff6b6b;
+        --dark-blue: #1e293b;
+        --soft-bg: #fdfaf8;
+        --soft-blue: #eff6ff;
+    }
+
+    body { font-family: 'Lexend', sans-serif; background-color: var(--soft-bg); }
+    .family-comfortaa { font-family: 'Comfortaa', cursive; }
+    .text-orange { color: var(--food-orange); }
+
+    /* Card Styling */
+    .edit-card { background: white; border: 1px solid rgba(0,0,0,0.02); }
+    .card-header-edit { background: #fff; border-bottom: 1px dashed #eee; }
+
+    .icon-circle-edit {
+        width: 60px; height: 60px;
+        background: #fff7ed;
+        color: var(--food-orange);
+        border-radius: 20px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.8rem;
+        box-shadow: 0 10px 20px rgba(255, 126, 95, 0.1);
+    }
+
+    /* Input Modern Styling */
+    .label-modern {
+        font-size: 0.7rem; font-weight: 800; color: #94a3b8;
+        letter-spacing: 1px; margin-left: 5px; margin-bottom: 8px; display: block;
+    }
+
+    .input-wrapper {
+        display: flex; align-items: center; background: #f8fafc;
+        border: 2px solid transparent; border-radius: 16px;
+        padding: 4px 15px; transition: all 0.3s;
+    }
+    .input-wrapper i { color: #cbd5e1; margin-right: 12px; font-size: 1.1rem; }
+    .input-modern {
+        background: transparent; border: none; padding: 12px 0;
+        width: 100%; outline: none; font-size: 1rem; color: var(--dark-blue);
+    }
+    .input-wrapper:focus-within {
+        background: #fff; border-color: var(--food-orange);
+        box-shadow: 0 8px 20px rgba(255, 126, 95, 0.08);
+    }
+    .input-wrapper:focus-within i { color: var(--food-orange); }
+
+    /* Buttons */
+    .btn-save-gradient {
+        background: linear-gradient(45deg, var(--food-orange), var(--food-red));
+        color: white; border: none; transition: all 0.3s;
+    }
+    .btn-save-gradient:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(255, 107, 107, 0.3); color: white; }
+
+    .btn-light-modern { background: #f1f5f9; color: #64748b; border: none; transition: 0.3s; }
+    .btn-light-modern:hover { background: #e2e8f0; color: var(--dark-navy); }
+
+    /* Helpers */
+    .bg-soft-blue { background-color: var(--soft-blue); }
+    .border-dashed-blue { border: 1px dashed #3b82f6; }
+    .text-danger-custom { font-size: 0.75rem; color: #ef4444; margin-top: 6px; display: block; padding-left: 5px; }
+    .alert-soft-danger { background: #fee2e2; color: #ef4444; }
+
+    /* Animations */
+    @@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-slide-up { animation: fadeInUp 0.6s ease-out both; }
+    .animate-fade-in { animation: fadeInUp 0.4s ease-out both; }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Hiệu ứng phản hồi khi bấm cập nhật
+        document.getElementById('editCategoryForm').addEventListener('submit', function() {
+            if ($(this).valid()) {
+                const btn = this.querySelector('button[type="submit"]');
+                btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> ĐANG LƯU...`;
+                btn.classList.add('disabled');
+            }
+        });
+    </script>
+}

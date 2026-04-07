@@ -1,0 +1,289 @@
+@model Daylifood.Models.Product
+@{
+    ViewData["Title"] = Model.Name;
+    var canBuy = User.Identity?.IsAuthenticated == true && (User.IsInRole("User") || User.IsInRole("Shipper"));
+    var isOutOfStock = Model.Stock < 1;
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<div class="product-detail-wrapper py-5">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-4 animate-fade-in">
+            <ol class="breadcrumb bg-white shadow-sm px-4 py-2 rounded-pill d-inline-flex border">
+                <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none text-muted small"><i class="bi bi-house-door-fill me-1"></i>Cửa hàng</a></li>
+                <li class="breadcrumb-item active small text-orange fw-bold" aria-current="page">@Model.Category.Name</li>
+            </ol>
+        </nav>
+
+        <div class="row g-lg-5 g-4 align-items-start">
+            <div class="col-md-6 animate-slide-right">
+                <div class="product-gallery position-relative shadow-2xl rounded-5 overflow-hidden bg-white p-3 border border-5 border-white">
+                    <div class="image-zoom-container rounded-4 overflow-hidden">
+                        <img id="mainProductImage" src="@(Model.ImageUrl ?? "/images/placeholder.svg")" 
+                             class="img-fluid w-100 transition-zoom" 
+                             alt="@Model.Name" />
+                    </div>
+                    
+                    @if (isOutOfStock)
+                    {
+                        <div class="stock-overlay d-flex align-items-center justify-content-center">
+                            <span class="badge-out">HẾT MÓN RỒI DUY ƠI!</span>
+                        </div>
+                    }
+                    
+                    <a asp-controller="Home" asp-action="Store" asp-route-id="@Model.StoreId" class="shop-badge shadow-sm">
+                        <i class="bi bi-shop me-2"></i> @Model.Store.Name
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-6 animate-slide-left">
+                <div class="product-info-panel ps-md-4">
+                    <div class="mb-3">
+                        <span class="category-tag">@Model.Category.Name</span>
+                        <span class="ms-2 small text-muted"><i class="bi bi-star-fill text-warning"></i> 4.9 (120+ đánh giá)</span>
+                    </div>
+                    
+                    <h1 class="display-5 fw-bold text-dark-blue mb-2 family-comfortaa">@Model.Name</h1>
+                    
+                    <div class="price-section d-flex align-items-center mb-4">
+                        <h2 class="text-orange fw-bold display-6 mb-0 me-3" id="productPrice" data-unit-price="@Model.Price">
+                            @Model.Price.ToString("N0")<small class="fs-5 ps-1">đ</small>
+                        </h2>
+                        <div class="stock-info">
+                            @if (!isOutOfStock)
+                            {
+                                <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Sẵn có: @Model.Stock</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="description-box mb-4">
+                        <h6 class="fw-bold text-uppercase text-muted small ls-1 mb-3">Mô tả món ăn</h6>
+                        <p class="description-text">@Model.Description</p>
+                    </div>
+
+                    <div class="action-card shadow-sm rounded-5 p-4 border border-light">
+                        @if (canBuy)
+                        {
+                            <form asp-controller="Cart" asp-action="Add" method="post" id="addToCartForm">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="productId" value="@Model.Id" />
+                                
+                                <div class="row g-3 align-items-center">
+                                    <div class="col-12 mb-2">
+                                        <label class="form-label-small fw-bold">CHỌN SỐ LƯỢNG:</label>
+                                        <div class="qty-pill d-flex align-items-center justify-content-between">
+                                            <button type="button" class="btn-qty" onclick="adjustQty(-1)"><i class="bi bi-dash"></i></button>
+                                            <input type="number" id="quantityInput" name="quantity" value="1" min="1" max="@Model.Stock" class="input-qty-modern" readonly />
+                                            <button type="button" class="btn-qty" onclick="adjustQty(1)"><i class="bi bi-plus"></i></button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        <div class="d-grid mt-2">
+                                            @if (isOutOfStock)
+                                            {
+                                                <button type="button" class="btn btn-secondary btn-lg rounded-pill py-3" disabled>
+                                                    <i class="bi bi-slash-circle me-2"></i> TẠM HẾT MÓN
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="submit" class="btn btn-food-add btn-lg rounded-pill py-3 fw-bold shadow-orange">
+                                                    <i class="bi bi-cart-plus-fill me-2"></i> THÊM VÀO GIỎ - <span id="totalPriceLine">@Model.Price.ToString("N0")đ</span>
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        }
+                        else if (User.Identity?.IsAuthenticated != true)
+                        {
+                            <div class="text-center py-2">
+                                <p class="mb-3 text-muted small">Hãy đăng nhập để tận hưởng món ngon này nhé!</p>
+                                <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path" 
+                                   class="btn btn-orange-outline btn-lg w-100 rounded-pill fw-bold">
+                                   ĐĂNG NHẬP NGAY
+                                </a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-soft-info border-0 rounded-4 mb-0 small">
+                                <i class="bi bi-info-circle-fill me-2"></i> Vai trò của bạn hiện không được quyền mua hàng. Hãy liên hệ hỗ trợ nếu đây là nhầm lẫn.
+                            </div>
+                        }
+                    </div>
+
+                    <div class="row mt-4 g-2">
+                        <div class="col-4 text-center">
+                            <div class="promise-item">
+                                <i class="bi bi-lightning-fill text-orange"></i>
+                                <span class="d-block x-small">Giao siêu tốc</span>
+                            </div>
+                        </div>
+                        <div class="col-4 text-center">
+                            <div class="promise-item">
+                                <i class="bi bi-shield-check text-success"></i>
+                                <span class="d-block x-small">Vệ sinh an toàn</span>
+                            </div>
+                        </div>
+                        <div class="col-4 text-center">
+                            <div class="promise-item">
+                                <i class="bi bi-award-fill text-primary"></i>
+                                <span class="d-block x-small">Chuẩn vị nhất</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --food-orange: #ff7e5f;
+        --food-orange-dark: #ff6b6b;
+        --dark-blue: #1e293b;
+        --soft-bg: #fdfaf8;
+        --emerald: #10b981;
+    }
+
+    body { font-family: 'Lexend', sans-serif; background-color: var(--soft-bg); }
+    .family-comfortaa { font-family: 'Comfortaa', cursive; }
+    .text-orange { color: var(--food-orange); }
+    .text-dark-blue { color: var(--dark-blue); }
+    .ls-1 { letter-spacing: 1px; }
+
+    /* Product Image Section */
+    .product-gallery {
+        background: #fff;
+        transition: transform 0.3s ease;
+    }
+    .image-zoom-container { cursor: zoom-in; }
+    .transition-zoom:hover { transform: scale(1.1); transition: transform 0.5s ease; }
+    
+    .stock-overlay {
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 2;
+    }
+    .badge-out {
+        background: #ef4444; color: white; padding: 10px 20px;
+        border-radius: 50px; font-weight: 800; font-size: 1rem;
+    }
+
+    .shop-badge {
+        position: absolute; bottom: 20px; right: 20px;
+        background: rgba(255,255,255,0.9); padding: 8px 15px;
+        border-radius: 50px; color: var(--dark-blue); font-weight: 600;
+        text-decoration: none; font-size: 0.8rem; z-index: 3;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    /* Details Panel */
+    .category-tag {
+        background: var(--food-orange); color: white;
+        padding: 4px 15px; border-radius: 50px; font-size: 0.75rem;
+        font-weight: 700; text-transform: uppercase;
+    }
+
+    .description-text { line-height: 1.8; color: #64748b; font-weight: 300; }
+
+    /* Action Card */
+    .action-card { background: white; }
+    .form-label-small { font-size: 0.7rem; color: #94a3b8; letter-spacing: 1px; margin-bottom: 10px; display: block; }
+    
+    .qty-pill { background: #f1f5f9; border-radius: 50px; padding: 6px 12px; width: 100%; max-width: 160px; }
+    .btn-qty { 
+        width: 32px; height: 32px; border-radius: 50%; border: none; 
+        background: white; color: var(--dark-blue); font-weight: bold;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.2s;
+    }
+    .btn-qty:hover { background: var(--food-orange); color: white; }
+    
+    .input-qty-modern { 
+        border: none; background: transparent; width: 40px; 
+        text-align: center; font-weight: 700; color: var(--dark-blue);
+    }
+
+    .btn-food-add {
+        background: linear-gradient(45deg, var(--food-orange), var(--food-orange-dark));
+        color: white; border: none; transition: all 0.3s;
+    }
+    .btn-food-add:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(255, 126, 95, 0.4); color: white; }
+
+    .btn-orange-outline { border: 2px solid var(--food-orange); color: var(--food-orange); transition: all 0.3s; }
+    .btn-orange-outline:hover { background: var(--food-orange); color: white; }
+
+    .promise-item { padding: 10px; background: #fff; border-radius: 15px; }
+    .promise-item i { font-size: 1.2rem; margin-bottom: 5px; }
+    .x-small { font-size: 0.65rem; font-weight: 600; color: #94a3b8; }
+
+    /* Animations */
+    @@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in { animation: fadeInUp 0.5s ease-out; }
+    .animate-slide-right { animation: fadeInUp 0.6s ease-out; }
+    .animate-slide-left { animation: fadeInUp 0.7s ease-out; }
+
+    .alert-soft-info { background: #eff6ff; color: #1e40af; }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function adjustQty(delta) {
+            const input = document.getElementById('quantityInput');
+            const unitPrice = parseFloat(document.getElementById('productPrice').getAttribute('data-unit-price'));
+            const totalLine = document.getElementById('totalPriceLine');
+            
+            let currentVal = parseInt(input.value);
+            let max = parseInt(input.getAttribute('max'));
+            let newVal = currentVal + delta;
+
+            if (newVal >= 1 && newVal <= max) {
+                input.value = newVal;
+                
+                // Cập nhật giá tổng trực tiếp trên nút (JS tương tác nhanh)
+                let total = newVal * unitPrice;
+                totalLine.innerText = total.toLocaleString('vi-VN') + 'đ';
+                
+                // Hiệu ứng "nhảy" nhẹ cho số
+                input.style.transform = 'scale(1.2)';
+                setTimeout(() => input.style.transform = 'scale(1)', 100);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('addToCartForm');
+            const btnSubmit = form?.querySelector('button[type="submit"]');
+
+            if (form) {
+                form.addEventListener('submit', () => {
+                    btnSubmit.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> ĐANG THÊM...`;
+                    btnSubmit.classList.add('disabled');
+                });
+            }
+            
+            // Image Mouse Move Zoom Effect (Optional but Luxury)
+            const imgContainer = document.querySelector('.image-zoom-container');
+            const img = document.getElementById('mainProductImage');
+            
+            imgContainer.addEventListener('mousemove', (e) => {
+                const x = e.clientX - e.target.offsetLeft;
+                const y = e.clientY - e.target.offsetTop;
+                img.style.transformOrigin = `${x}px ${y}px`;
+                img.style.transform = "scale(1.5)";
+            });
+            
+            imgContainer.addEventListener('mouseleave', () => {
+                img.style.transformOrigin = "center";
+                img.style.transform = "scale(1)";
+            });
+        });
+    </script>
+}

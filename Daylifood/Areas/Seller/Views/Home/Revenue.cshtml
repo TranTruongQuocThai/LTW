@@ -1,0 +1,161 @@
+@model List<Daylifood.Models.OrderItem>
+@{
+    ViewData["Title"] = "Báo cáo doanh thu";
+    var totalRevenue = (decimal)ViewBag.TotalRevenue;
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Lexend:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<div class="revenue-wrapper py-4">
+    <div class="container">
+        
+        <nav aria-label="breadcrumb" class="mb-4 animate-fade-in">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-area="Seller" asp-controller="Home" asp-action="Index" class="text-decoration-none text-muted">Kênh người bán</a></li>
+                <li class="breadcrumb-item active fw-bold text-emerald" aria-current="page">Báo cáo doanh thu</li>
+            </ol>
+        </nav>
+
+        <div class="revenue-hero-card shadow-emerald-sm rounded-5 p-5 mb-5 text-white animate-up">
+            <div class="row align-items-center">
+                <div class="col-md-7">
+                    <h6 class="text-uppercase fw-bold ls-2 opacity-75 mb-3">TỔNG DOANH THU TÍCH LŨY</h6>
+                    <h1 class="display-3 fw-800 mb-2">@totalRevenue.ToString("N0") <small class="fs-4">đ</small></h1>
+                    <p class="mb-0 opacity-75"><i class="bi bi-info-circle me-2"></i>Dữ liệu được tính dựa trên các đơn hàng đã giao thành công.</p>
+                </div>
+                <div class="col-md-5 text-md-end d-none d-md-block">
+                    <div class="revenue-icon-floating">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-2xl rounded-5 overflow-hidden animate-slide-up">
+            <div class="card-header bg-white border-0 p-4 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold text-dark-blue mb-0">Nhật ký giao dịch chi tiết</h5>
+                <button class="btn btn-light-modern btn-sm rounded-pill px-3" onclick="window.print()">
+                    <i class="bi bi-printer me-2"></i>Xuất báo cáo
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light-soft">
+                        <tr>
+                            <th class="ps-4 py-3 text-uppercase ls-1">Mã đơn</th>
+                            <th class="py-3 text-uppercase ls-1">Thời gian</th>
+                            <th class="py-3 text-uppercase ls-1">Sản phẩm</th>
+                            <th class="py-3 text-uppercase ls-1 text-center">Số lượng</th>
+                            <th class="pe-4 py-3 text-uppercase ls-1 text-end">Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var line in Model)
+                        {
+                            <tr class="revenue-row">
+                                <td class="ps-4">
+                                    <span class="fw-bold text-primary">#@line.OrderId</span>
+                                </td>
+                                <td>
+                                    <div class="small fw-semibold text-dark">@line.Order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</div>
+                                    <div class="x-small text-muted">@line.Order.CreatedAt.ToLocalTime().ToString("HH:mm")</div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="product-dot me-2"></div>
+                                        <span class="fw-bold text-dark-blue">@line.Product.Name</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-soft-primary text-primary rounded-pill px-3">x @line.Quantity</span>
+                                </td>
+                                <td class="pe-4 text-end">
+                                    <span class="fw-800 text-emerald">@((line.Price * line.Quantity).ToString("N0")) <small class="fw-normal">đ</small></span>
+                                </td>
+                            </tr>
+                        }
+                        
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <i class="bi bi-cash-stack display-1 opacity-10 d-block mb-3"></i>
+                                    <h5 class="text-muted">Chưa có giao dịch nào hoàn tất.</h5>
+                                    <p class="small text-muted">Hãy tập trung tối ưu món ăn để bắt đầu nhận doanh thu nhé!</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="mt-4 text-center">
+            <p class="text-muted small italic">
+                <i class="bi bi-shield-lock-fill me-1 text-emerald"></i>
+                Báo cáo doanh thu được bảo mật và chỉ hiển thị cho chủ sở hữu cửa hàng.
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --dark-blue: #0f172a;
+        --emerald: #10b981;
+        --emerald-dark: #059669;
+        --soft-bg: #f8fafc;
+        --soft-primary: #eff6ff;
+        --ls-spacing: 1px;
+    }
+
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--soft-bg); }
+    .fw-800 { font-weight: 800; }
+    .ls-1 { letter-spacing: var(--ls-spacing); font-size: 0.7rem; font-weight: 800; color: #94a3b8; }
+    .ls-2 { letter-spacing: 2px; }
+
+    /* Revenue Hero Card */
+    .revenue-hero-card {
+        background: linear-gradient(135deg, #064e3b 0%, #10b981 100%);
+        border: none;
+        position: relative;
+        overflow: hidden;
+    }
+    .shadow-emerald-sm { box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2); }
+    
+    .revenue-icon-floating {
+        font-size: 8rem;
+        color: rgba(255,255,255,0.1);
+        transform: rotate(10deg) translateY(20px);
+    }
+
+    /* Table & Cards */
+    .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05); }
+    .bg-light-soft { background-color: #fcfcfc; }
+    .revenue-row { transition: all 0.2s; }
+    .revenue-row:hover { background-color: #fafbfc; }
+
+    .product-dot { width: 8px; height: 8px; background: var(--emerald); border-radius: 50%; }
+    .text-emerald { color: var(--emerald) !important; }
+    .bg-soft-primary { background: var(--soft-primary); }
+
+    /* Buttons */
+    .btn-light-modern { background: #f1f5f9; color: #475569; border: none; font-weight: 700; transition: 0.3s; }
+    .btn-light-modern:hover { background: #e2e8f0; color: var(--dark-blue); }
+
+    /* Animations */
+    @@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-up { animation: fadeInUp 0.7s ease-out both; }
+    .animate-slide-up { animation: fadeInUp 0.6s ease-out both; }
+    .animate-fade-in { animation: fadeInUp 0.4s ease-out both; }
+
+    .x-small { font-size: 0.65rem; }
+    .italic { font-style: italic; }
+
+    @@media print {
+        .admin-navbar, .breadcrumb, .btn-light-modern, .footer-note { display: none !important; }
+        .revenue-hero-card { color: black !important; background: white !important; border: 1px solid #ddd !important; }
+        .revenue-wrapper { padding: 0 !important; }
+    }
+</style>

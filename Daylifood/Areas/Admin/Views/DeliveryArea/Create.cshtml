@@ -1,0 +1,161 @@
+@model Daylifood.Models.DeliveryArea
+@{
+    ViewData["Title"] = "Thêm khu vực giao hàng";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<div class="admin-container py-5">
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mb-4 animate-fade-in">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none text-muted">Quản lý khu vực</a></li>
+                <li class="breadcrumb-item active fw-bold text-emerald" aria-current="page">Thêm mới</li>
+            </ol>
+        </nav>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-7 col-xl-6">
+                <div class="create-card shadow-2xl border-0 rounded-5 overflow-hidden animate-slide-up">
+                    <div class="card-header-map p-4 text-center">
+                        <div class="icon-circle-map mb-3 mx-auto">
+                            <i class="bi bi-geo-alt-fill"></i>
+                        </div>
+                        <h2 class="fw-bold text-dark-blue family-comfortaa mb-1">Mở rộng vùng phủ</h2>
+                        <p class="text-muted small">Thêm các quận/huyện mới vào hệ thống giao hàng của Daylifood.</p>
+                    </div>
+
+                    <div class="card-body p-4 p-md-5 bg-white">
+                        <form asp-action="Create" method="post" id="createAreaForm">
+                            @Html.AntiForgeryToken()
+                            
+                            <div asp-validation-summary="ModelOnly" class="alert alert-soft-danger py-2 small border-0 rounded-3 mb-4"></div>
+
+                            <div class="form-group-modern mb-4">
+                                <label asp-for="Name" class="label-modern">TÊN KHU VỰC (QUẬN / HUYỆN)</label>
+                                <div class="input-wrapper">
+                                    <i class="bi bi-map"></i>
+                                    <input asp-for="Name" class="input-modern" placeholder="Ví dụ: Quận 1, TP. Thủ Đức..." autocomplete="off" />
+                                </div>
+                                <span asp-validation-for="Name" class="text-danger-custom"></span>
+                            </div>
+
+                            <div class="form-group-modern mb-4">
+                                <label asp-for="SortOrder" class="label-modern">THỨ TỰ HIỂN THỊ</label>
+                                <div class="input-wrapper">
+                                    <i class="bi bi-sort-numeric-down"></i>
+                                    <input asp-for="SortOrder" type="number" class="input-modern" placeholder="Số càng nhỏ hiện càng đầu..." />
+                                </div>
+                                <p class="x-small text-muted mt-2 ms-1">Mẹo: Để số 1 cho các quận trung tâm.</p>
+                            </div>
+
+                            <div class="d-grid gap-3 mt-5">
+                                <button type="submit" class="btn btn-emerald-gradient py-3 fw-bold rounded-pill shadow-emerald">
+                                    LƯU KHU VỰC MỚI <i class="bi bi-plus-circle-dotted ms-1"></i>
+                                </button>
+                                <a asp-action="Index" class="btn btn-light-modern py-3 fw-bold rounded-pill text-decoration-none text-center">
+                                    Hủy và quay lại
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-4 rounded-4 bg-soft-emerald border-dashed-emerald animate-fade-in" style="animation-delay: 0.2s;">
+                    <h6 class="fw-bold text-dark-blue small mb-2"><i class="bi bi-shield-check me-2"></i>Bạn ơi, lưu ý nhé:</h6>
+                    <ul class="text-muted small mb-0 ps-3">
+                        <li class="mb-1">Tên khu vực nên viết hoa chữ cái đầu cho đồng bộ.</li>
+                        <li>Khu vực sau khi thêm sẽ hiện ngay lập tức ở trang **Thanh toán**.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --emerald: #10b981;
+        --emerald-dark: #059669;
+        --dark-blue: #1e293b;
+        --soft-bg: #f8fafc;
+        --soft-emerald: #ecfdf5;
+    }
+
+    body { font-family: 'Lexend', sans-serif; background-color: var(--soft-bg); }
+    .family-comfortaa { font-family: 'Comfortaa', cursive; }
+    .text-emerald { color: var(--emerald); }
+
+    /* Card Styling */
+    .create-card { background: white; border: 1px solid rgba(0,0,0,0.03); }
+    .card-header-map { background: #fff; border-bottom: 1px dashed #e2e8f0; }
+
+    .icon-circle-map {
+        width: 65px; height: 65px;
+        background: var(--soft-emerald);
+        color: var(--emerald);
+        border-radius: 22px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.8rem;
+        box-shadow: 0 10px 25px rgba(16, 185, 129, 0.12);
+    }
+
+    /* Modern Input */
+    .label-modern {
+        font-size: 0.7rem; font-weight: 800; color: #94a3b8;
+        letter-spacing: 1px; margin-left: 5px; margin-bottom: 8px; display: block;
+    }
+
+    .input-wrapper {
+        display: flex; align-items: center; background: #f1f5f9;
+        border: 2px solid transparent; border-radius: 18px;
+        padding: 5px 20px; transition: all 0.3s;
+    }
+    .input-wrapper i { color: #94a3b8; margin-right: 15px; font-size: 1.1rem; }
+    .input-modern {
+        background: transparent; border: none; padding: 12px 0;
+        width: 100%; outline: none; font-size: 1rem; color: var(--dark-blue);
+    }
+    .input-wrapper:focus-within {
+        background: #fff; border-color: var(--emerald);
+        box-shadow: 0 10px 20px rgba(16, 185, 129, 0.08);
+    }
+    .input-wrapper:focus-within i { color: var(--emerald); }
+
+    /* Buttons */
+    .btn-emerald-gradient {
+        background: linear-gradient(135deg, var(--emerald), var(--emerald-dark));
+        color: white; border: none; transition: all 0.3s;
+    }
+    .btn-emerald-gradient:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3); color: white; }
+
+    .btn-light-modern { background: #fff; color: #64748b; border: 1.5px solid #e2e8f0; transition: 0.3s; }
+    .btn-light-modern:hover { background: #f8fafc; color: var(--dark-blue); border-color: #cbd5e1; }
+
+    /* Helpers */
+    .bg-soft-emerald { background-color: var(--soft-emerald); }
+    .border-dashed-emerald { border: 1px dashed var(--emerald); }
+    .text-danger-custom { font-size: 0.75rem; color: #ef4444; margin-top: 6px; display: block; padding-left: 8px; }
+    .alert-soft-danger { background: #fee2e2; color: #ef4444; }
+    .x-small { font-size: 0.7rem; }
+
+    /* Animations */
+    @@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-slide-up { animation: fadeInUp 0.6s ease-out both; }
+    .animate-fade-in { animation: fadeInUp 0.4s ease-out both; }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Hiệu ứng phản hồi khi bấm lưu
+        document.getElementById('createAreaForm').addEventListener('submit', function() {
+            if ($(this).valid()) {
+                const btn = this.querySelector('button[type="submit"]');
+                btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> ĐANG XỬ LÝ...`;
+                btn.classList.add('disabled');
+            }
+        });
+    </script>
+}

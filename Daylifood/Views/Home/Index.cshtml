@@ -1,0 +1,277 @@
+@model List<Daylifood.Models.Product>
+@{
+    ViewData["Title"] = "Thực đơn Daylifood";
+    var categories = ViewBag.Categories as List<Daylifood.Models.Category> ?? new();
+    var selected = ViewBag.SelectedCategoryId as int?;
+    var searchQ = ViewBag.SearchQuery as string;
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<div class="menu-page-wrapper py-5">
+    <div class="container mb-5 animate-up">
+        <div class="row align-items-center">
+            <div class="col-md-8 text-center text-md-start">
+                <span class="badge rounded-pill bg-soft-orange text-orange px-3 py-2 mb-3 fw-bold">DAYLIFOOD MENU</span>
+                <h1 class="display-5 fw-bold family-comfortaa text-dark-blue">Chào bạn, ăn gì cũng có!</h1>
+                <p class="text-muted">Hơn 1.000 món ngon từ các quán uy tín đang chờ bạn khám phá.</p>
+            </div>
+            <div class="col-md-4 d-none d-md-block text-end">
+                <div class="floating-img">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3565/3565418.png" style="width: 120px;" alt="Food">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mb-4 position-relative">
+        <div class="row g-3 align-items-center">
+            <div class="col-lg-5 col-md-6">
+                <form method="get" asp-action="Index" class="search-form-premium shadow-sm">
+                    <input type="hidden" name="categoryId" value="@selected" />
+                    <i class="bi bi-search ms-3 text-muted"></i>
+                    <input type="text" name="q" value="@searchQ" class="form-control border-0 bg-transparent shadow-none" placeholder="Tìm tên món hoặc quán ăn..." />
+                    <button type="submit" class="btn btn-food-orange rounded-circle me-1">
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+
+            <div class="col-lg-2 col-md-3">
+                <button class="btn btn-category-toggle w-100 shadow-sm" onclick="toggleCategoryBox()">
+                    <i class="bi bi-grid-3x3-gap-fill me-2"></i> Thể loại
+                </button>
+            </div>
+
+            <div class="col-lg-5 col-md-3">
+                <div class="category-slider-horizontal">
+                    <div class="slider-content">
+                        <a class="cat-pill-modern @(selected == null ? "active" : "")" asp-action="Index" asp-route-q="@searchQ">Tất cả</a>
+                        @foreach (var c in categories) {
+                            <a class="cat-pill-modern @(selected == c.Id ? "active" : "")" asp-action="Index" asp-route-categoryId="@c.Id" asp-route-q="@searchQ">@c.Name</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="category-grid-box" class="category-grid-overlay shadow-2xl">
+            <div class="p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+                    <h5 class="fw-bold m-0 text-dark-blue">Tất cả danh mục</h5>
+                    <button class="btn-close-box" onclick="toggleCategoryBox()"><i class="bi bi-x-lg"></i></button>
+                </div>
+                <div class="row g-3">
+                    @foreach (var c in categories) {
+                        <div class="col-4 col-sm-3 col-md-2">
+                            <a class="grid-cat-item @(selected == c.Id ? "active" : "")" asp-action="Index" asp-route-categoryId="@c.Id" asp-route-q="@searchQ">
+                                <div class="grid-icon-box"><i class="bi bi-egg-fried"></i></div>
+                                <span>@c.Name</span>
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-5">
+        @if (!Model.Any()) {
+            <div class="empty-state text-center py-5 rounded-5 bg-white border border-dashed">
+                <i class="bi bi-search display-1 opacity-10 mb-3"></i>
+                <h4 class="fw-bold text-dark-blue">Không tìm thấy món bạn yêu cầu</h4>
+                <p class="text-muted">Bạn thử đổi từ khóa hoặc xem danh mục khác nhé.</p>
+                <a asp-action="Index" class="btn btn-food-orange rounded-pill px-5 mt-2">LÀM MỚI THỰC ĐƠN</a>
+            </div>
+        } else {
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="menu-grid">
+                @foreach (var p in Model) {
+                    <div class="col product-item">
+                        <div class="food-card shadow-sm border-0 h-100">
+                            <div class="card-img-container">
+                                <img src="@(p.ImageUrl ?? "/images/placeholder.svg")" class="card-img-top" alt="@p.Name" />
+                                <div class="price-badge">@p.Price.ToString("N0")<small>đ</small></div>
+                                
+                                @if (p.Stock < 1) {
+                                    <div class="sold-out-overlay">HẾT HÀNG</div>
+                                }
+                                
+                                <div class="hover-actions">
+                                    <a asp-action="Detail" asp-route-id="@p.Id" class="btn-eye" title="Xem chi tiết"><i class="bi bi-eye-fill"></i></a>
+                                </div>
+                            </div>
+
+                            <div class="card-body p-3 d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="text-orange fw-800 text-uppercase" style="font-size: 0.65rem;">@p.Category.Name</small>
+                                    <div class="rating-box"><i class="bi bi-star-fill me-1"></i>4.9</div>
+                                </div>
+                                
+                                <h6 class="food-name-title text-truncate mb-1">@p.Name</h6>
+
+                                <div class="store-mini-info mb-3">
+                                    <a asp-controller="Home" asp-action="Store" asp-route-id="@p.StoreId" class="text-decoration-none">
+                                        <i class="bi bi-shop me-1 text-success"></i>
+                                        <span class="text-muted small">@p.Store.Name</span>
+                                    </a>
+                                </div>
+
+                                <div class="mt-auto">
+                                    @if (p.Stock > 0) {
+                                        <form asp-controller="Cart" asp-action="Add" method="post" class="d-flex flex-column gap-2">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="productId" value="@p.Id" />
+                                            
+                                            <div class="qty-control-pill d-flex align-items-center justify-content-between">
+                                                <button type="button" class="btn-qty" onclick="stepQty(this, -1)">-</button>
+                                                <input type="number" name="quantity" value="1" min="1" max="@p.Stock" class="qty-input-card" readonly />
+                                                <button type="button" class="btn-qty" onclick="stepQty(this, 1)">+</button>
+                                            </div>
+
+                                            <button type="submit" class="btn btn-buy-premium w-100 py-2 rounded-pill fw-bold">
+                                                MUA NGAY <i class="bi bi-cart-plus-fill ms-1"></i>
+                                            </button>
+                                        </form>
+                                    } else {
+                                        <button class="btn btn-secondary w-100 py-2 rounded-pill disabled opacity-50 fw-bold">TẠM HẾT</button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    :root {
+        --food-orange: #ff7e5f;
+        --food-orange-dark: #ff6b6b;
+        --dark-blue: #1e293b;
+        --soft-orange: #fff1ed;
+        --bg-warm: #fdfaf8;
+    }
+
+    body { font-family: 'Lexend', sans-serif; background-color: var(--bg-warm); }
+    .family-comfortaa { font-family: 'Comfortaa', cursive; }
+    .text-orange { color: var(--food-orange); }
+    .fw-800 { font-weight: 800; }
+
+    /* Search Premium */
+    .search-form-premium { background: #fff; border-radius: 50px; display: flex; align-items: center; padding: 5px; border: 2px solid #fff; transition: 0.3s; }
+    .search-form-premium:focus-within { border-color: var(--food-orange); box-shadow: 0 10px 25px rgba(255, 126, 95, 0.1); }
+    .btn-food-orange { background: var(--food-orange); color: white; border: none; width: 40px; height: 40px; transition: 0.3s; }
+    .btn-food-orange:hover { transform: scale(1.1); background: var(--food-orange-dark); }
+
+    /* Category Toggle Button */
+    .btn-category-toggle { background: white; border: 2px solid #f1f5f9; border-radius: 50px; padding: 10px 20px; font-weight: 600; color: var(--dark-blue); transition: 0.3s; }
+    .btn-category-toggle:hover, .btn-category-toggle.active { background: var(--food-orange); color: white; border-color: var(--food-orange); }
+
+    /* Horizontal Category Slider */
+    .category-slider-horizontal { overflow-x: auto; scrollbar-width: none; padding-bottom: 5px; }
+    .category-slider-horizontal::-webkit-scrollbar { display: none; }
+    .slider-content { display: flex; gap: 10px; white-space: nowrap; }
+
+    .cat-pill-modern { padding: 10px 22px; background: white; border-radius: 50px; color: var(--dark-blue); text-decoration: none !important; font-weight: 600; font-size: 0.9rem; border: 1.5px solid #f1f5f9; transition: 0.3s; }
+    .cat-pill-modern.active { background: var(--food-orange); color: white !important; border-color: transparent; box-shadow: 0 8px 15px rgba(255, 126, 95, 0.2); }
+
+    /* Expandable Grid Overlay */
+    .category-grid-overlay { display: none; position: absolute; left: 0; right: 0; background: white; z-index: 1000; border-radius: 35px; margin: 15px; animation: slideDown 0.4s ease-out; }
+    
+    @@keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+    .grid-cat-item { display: flex; flex-direction: column; align-items: center; text-decoration: none !important; color: var(--dark-blue); padding: 15px; border-radius: 20px; transition: 0.3s; }
+    .grid-cat-item:hover { background: var(--soft-orange); transform: translateY(-3px); }
+    .grid-cat-item span { font-size: 0.75rem; font-weight: 700; margin-top: 8px; text-align: center; }
+    .grid-icon-box { width: 50px; height: 50px; background: var(--bg-warm); border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: var(--food-orange); }
+
+    /* Food Card Modern */
+    .food-card { background: white; border-radius: 30px; overflow: hidden; transition: 0.4s; }
+    .food-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.06) !important; }
+
+    .card-img-container { position: relative; height: 200px; overflow: hidden; }
+    .card-img-container img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s; }
+    .food-card:hover .card-img-container img { transform: scale(1.1); }
+
+    .price-badge { position: absolute; bottom: 15px; left: 15px; background: white; padding: 5px 15px; border-radius: 50px; font-weight: 800; color: var(--dark-blue); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+    .price-badge small { color: var(--food-orange); margin-left: 2px; }
+
+    .hover-actions { position: absolute; top: 15px; right: -50px; transition: 0.3s; }
+    .food-card:hover .hover-actions { right: 15px; }
+    .btn-eye { width: 40px; height: 40px; background: white; border-radius: 14px; display: flex; align-items: center; justify-content: center; color: var(--dark-blue); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+    .food-name-title { font-weight: 700; color: var(--dark-blue); font-size: 1.05rem; }
+    .rating-box { background: #fffbeb; color: #b45309; padding: 2px 10px; border-radius: 50px; font-size: 0.7rem; font-weight: 700; }
+
+    /* Quantity & Buy Button */
+    .qty-control-pill { background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 50px; padding: 4px; }
+    .btn-qty { width: 30px; height: 30px; background: white; border: none; border-radius: 50%; font-weight: 800; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: 0.2s; }
+    .btn-qty:hover { background: var(--food-orange); color: white; }
+    .qty-input-card { width: 40px; border: none; background: transparent; text-align: center; font-weight: 700; font-size: 0.9rem; outline: none; }
+
+    .btn-buy-premium { background: linear-gradient(45deg, var(--food-orange), var(--food-orange-dark)); color: white; border: none; box-shadow: 0 5px 15px rgba(255, 126, 95, 0.25); transition: 0.3s; }
+    .btn-buy-premium:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 126, 95, 0.4); }
+
+    /* Animation */
+    @@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-up { animation: fadeInUp 0.7s ease-out; }
+
+    input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+</style>
+
+@section Scripts {
+    <script>
+        // 1. Đóng/Mở Box Thể Loại
+        function toggleCategoryBox() {
+            const box = document.getElementById('category-grid-box');
+            const btn = document.querySelector('.btn-category-toggle');
+            if (box.style.display === "block") {
+                box.style.display = "none";
+                btn.classList.remove('active');
+            } else {
+                box.style.display = "block";
+                btn.classList.add('active');
+            }
+        }
+
+        // Đóng khi click ngoài vùng
+        document.addEventListener('click', function(event) {
+            const box = document.getElementById('category-grid-box');
+            const btn = document.querySelector('.btn-category-toggle');
+            if (box.style.display === "block" && !box.contains(event.target) && !btn.contains(event.target)) {
+                box.style.display = "none";
+                btn.classList.remove('active');
+            }
+        });
+
+        // 2. Tăng giảm số lượng mượt mà
+        function stepQty(btn, delta) {
+            const input = btn.parentElement.querySelector('input[name="quantity"]');
+            let currentVal = parseInt(input.value);
+            const max = parseInt(input.getAttribute('max'));
+            let newVal = currentVal + delta;
+            if (newVal >= 1 && newVal <= max) {
+                input.value = newVal;
+                input.style.transform = 'scale(1.2)';
+                setTimeout(() => input.style.transform = 'scale(1)', 100);
+            }
+        }
+
+        // 3. Hiệu ứng hiện món ăn từng cái một
+        document.addEventListener('DOMContentLoaded', () => {
+            const items = document.querySelectorAll('.product-item');
+            items.forEach((item, index) => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(20px)';
+                item.style.transition = 'all 0.5s ease-out';
+                setTimeout(() => {
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateY(0)';
+                }, index * 80);
+            });
+        });
+    </script>
+}

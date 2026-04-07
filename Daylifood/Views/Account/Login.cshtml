@@ -1,0 +1,266 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Chào mừng bạn trở lại";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Lexend:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<div class="login-page-wrapper">
+    <div class="food-decor decor-1"><i class="bi bi-egg-fried"></i></div>
+    <div class="food-decor decor-2"><i class="bi bi-cup-hot"></i></div>
+    <div class="food-decor decor-3"><i class="bi bi-cake2"></i></div>
+    <div class="food-decor decor-4"><i class="bi bi-pizza"></i></div>
+
+    <div class="container">
+        <div class="row justify-content-center align-items-center min-vh-100">
+            <div class="col-md-6 col-lg-5 col-xl-4">
+                <div class="login-card shadow-2xl">
+                    <div class="card-body p-4 p-md-5">
+                        
+                        <div class="text-center mb-5">
+                            <div class="brand-logo mb-3">
+                                <i class="bi bi-bag-heart-fill text-white"></i>
+                            </div>
+                            <h2 class="fw-bold text-dark mb-1 family-comfortaa">Chào bạn nhé!</h2>
+                            <p class="text-muted small">Đăng nhập để đặt món ngon ngay thôi nào</p>
+                        </div>
+
+                        <form asp-action="Login" method="post" id="loginForm">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="ReturnUrl" />
+                            
+                            <div asp-validation-summary="ModelOnly" class="alert alert-soft-danger py-2 small border-0 mb-4"></div>
+
+                            <div class="mb-4">
+                                <label asp-for="Email" class="form-label-custom">EMAIL CỦA BẠN</label>
+                                <div class="input-modern-group">
+                                    <i class="bi bi-envelope icon-prefix"></i>
+                                    <input asp-for="Email" class="form-control-modern" placeholder="duy@daylifood.vn" />
+                                </div>
+                                <span asp-validation-for="Email" class="text-danger-custom"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <label asp-for="Password" class="form-label-custom">MẬT KHẨU</label>
+                                    <a href="#" class="forgot-link">Quên?</a>
+                                </div>
+                                <div class="input-modern-group">
+                                    <i class="bi bi-shield-lock icon-prefix"></i>
+                                    <input asp-for="Password" id="passwordInput" type="password" class="form-control-modern" placeholder="••••••••" />
+                                    <button type="button" class="btn-toggle-password" id="togglePassword">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                <span asp-validation-for="Password" class="text-danger-custom"></span>
+                            </div>
+
+                            <div class="mb-4 d-flex align-items-center justify-content-between">
+                                <div class="form-check custom-check">
+                                    <input asp-for="RememberMe" class="form-check-input" />
+                                    <label asp-for="RememberMe" class="form-check-label text-muted small">Lưu đăng nhập</label>
+                                </div>
+                            </div>
+
+                            <div class="d-grid mb-4">
+                                <button type="submit" class="btn btn-food-submit py-3 shadow-orange">
+                                    VÀO ĂN THÔI! <i class="bi bi-arrow-right-short ms-1"></i>
+                                </button>
+                            </div>
+
+                            <div class="text-center">
+                                <span class="text-muted small">Mới biết đến Daylifood?</span>
+                                <a asp-action="Register" class="text-orange fw-bold text-decoration-none ms-1 small-hover">Đăng ký ngay</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <p class="text-center mt-4 text-muted x-small">
+                    © 2026 <strong>Daylifood</strong> - Ship niềm vui tận cửa
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-orange: #ff7e5f;
+        --secondary-orange: #feb47b;
+        --bg-warm: #fff9f5;
+        --text-dark: #2d3436;
+    }
+
+    body {
+        font-family: 'Lexend', sans-serif;
+        background-color: var(--bg-warm);
+        overflow-x: hidden;
+    }
+
+    .family-comfortaa { font-family: 'Comfortaa', cursive; }
+
+    .login-page-wrapper {
+        min-height: 100vh;
+        position: relative;
+        /* Background pattern mờ ảo về đồ ăn */
+        background-image: radial-gradient(#feb47b 0.5px, transparent 0.5px);
+        background-size: 40px 40px;
+    }
+
+    /* Floating Food Icons */
+    .food-decor {
+        position: absolute;
+        font-size: 2.5rem;
+        color: var(--primary-orange);
+        opacity: 0.1;
+        z-index: 0;
+        animation: floating 6s infinite ease-in-out;
+    }
+    .decor-1 { top: 10%; left: 10%; animation-delay: 0s; }
+    .decor-2 { top: 20%; right: 15%; animation-delay: 2s; }
+    .decor-3 { bottom: 15%; left: 15%; animation-delay: 4s; }
+    .decor-4 { bottom: 10%; right: 10%; animation-delay: 1s; }
+
+    @@keyframes floating {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(10deg); }
+    }
+
+    /* Card Styling */
+    .login-card {
+        background: white;
+        border-radius: 35px;
+        border: 8px solid #fff; /* Tạo viền giả nổi khối */
+        box-shadow: 0 20px 60px rgba(255, 126, 95, 0.15);
+        position: relative;
+        z-index: 1;
+    }
+
+    .brand-logo {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(45deg, var(--primary-orange), var(--secondary-orange));
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 22px;
+        font-size: 2rem;
+        box-shadow: 0 10px 20px rgba(255, 126, 95, 0.3);
+    }
+
+    /* Input Styling */
+    .form-label-custom {
+        font-size: 0.7rem;
+        font-weight: 800;
+        color: #b2bec3;
+        letter-spacing: 1px;
+        margin-left: 5px;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .input-modern-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+        background: #fdf2ee;
+        border-radius: 18px;
+        padding: 4px 15px;
+        border: 2px solid transparent;
+        transition: all 0.3s;
+    }
+
+    .input-modern-group:focus-within {
+        background: #fff;
+        border-color: var(--primary-orange);
+        box-shadow: 0 8px 20px rgba(255, 126, 95, 0.1);
+    }
+
+    .icon-prefix { color: var(--primary-orange); font-size: 1.1rem; margin-right: 12px; }
+
+    .form-control-modern {
+        background: transparent;
+        border: none;
+        padding: 12px 0;
+        width: 100%;
+        outline: none;
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+
+    .btn-toggle-password {
+        background: none;
+        border: none;
+        color: #b2bec3;
+        padding: 0 5px;
+    }
+
+    /* Buttons & Links */
+    .btn-food-submit {
+        background: linear-gradient(45deg, var(--primary-orange), var(--secondary-orange));
+        color: white;
+        border: none;
+        border-radius: 18px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        transition: all 0.3s;
+    }
+
+    .btn-food-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 25px rgba(255, 126, 95, 0.4);
+        color: white;
+    }
+
+    .forgot-link { font-size: 0.75rem; color: var(--primary-orange); text-decoration: none; font-weight: 600; }
+    .text-orange { color: var(--primary-orange); }
+    .small-hover:hover { text-decoration: underline !important; }
+    
+    .custom-check .form-check-input:checked {
+        background-color: var(--primary-orange);
+        border-color: var(--primary-orange);
+    }
+
+    .text-danger-custom { font-size: 0.7rem; color: #ff4757; margin-top: 5px; display: block; }
+    .x-small { font-size: 0.7rem; }
+    .alert-soft-danger { background: #ffeef0; color: #ff4757; }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('passwordInput');
+            const toggleBtn = document.getElementById('togglePassword');
+            const form = document.getElementById('loginForm');
+
+            // 1. Hiện/Ẩn mật khẩu
+            toggleBtn.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.querySelector('i').classList.toggle('bi-eye');
+                this.querySelector('i').classList.toggle('bi-eye-slash');
+            });
+
+            // 2. Hiệu ứng rung nhẹ khi có lỗi validation (giả lập)
+            form.addEventListener('submit', function() {
+                if (!$(this).valid()) {
+                    const card = document.querySelector('.login-card');
+                    card.classList.add('shake-anim');
+                    setTimeout(() => card.classList.remove('shake-anim'), 500);
+                }
+            });
+        });
+    </script>
+    
+    <style>
+        @@keyframes shake-anim {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        .shake-anim { animation: shake-anim 0.4s ease-in-out; }
+    </style>
+}

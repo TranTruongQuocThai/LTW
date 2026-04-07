@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Quản trị DayliFood</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <style>
+        :root {
+            --admin-navy: #0f172a;
+            --admin-navy-light: #1e293b;
+            --admin-emerald: #10b981;
+            --admin-orange: #ff7e5f;
+            --admin-blue: #3b82f6;
+            --bg-soft: #f8fafc;
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: var(--bg-soft);
+            color: #334155;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar Command Center */
+        .admin-navbar {
+            background-color: var(--admin-navy) !important;
+            padding: 0.75rem 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(45deg, #fff 30%, var(--admin-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.4rem;
+        }
+
+        /* Nav Links Modern */
+        .nav-link-admin {
+            color: rgba(255,255,255,0.7) !important;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0.5rem 1rem !important;
+            margin: 0 0.2rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link-admin:hover {
+            color: #fff !important;
+            background: rgba(255,255,255,0.05);
+        }
+
+        /* Active State Indicator */
+        .nav-link-admin.active {
+            color: var(--admin-orange) !important;
+            background: rgba(255,126,95,0.1);
+        }
+
+        .nav-link-admin.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 20%;
+            right: 20%;
+            height: 3px;
+            background: var(--admin-orange);
+            border-radius: 10px;
+            box-shadow: 0 0 10px var(--admin-orange);
+        }
+
+        /* User Profile in Admin Bar */
+        .admin-profile-pill {
+            background: var(--admin-navy-light);
+            padding: 5px 15px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .admin-avatar-sm {
+            width: 28px; height: 28px;
+            background: var(--admin-orange);
+            color: white;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 0.8rem;
+        }
+
+        /* Alert System Redesign */
+        .admin-alert {
+            border: none;
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideInRight 0.5s ease-out;
+        }
+        
+        @@keyframes slideInRight {
+            from { transform: translateX(30px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Content Area */
+        .main-admin-content {
+            flex-grow: 1;
+            padding-top: 2rem;
+            padding-bottom: 4rem;
+            animation: fadeInBody 0.4s ease-in;
+        }
+
+        @@keyframes fadeInBody {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .btn-logout-admin {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #ef4444 !important;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .btn-logout-admin:hover { opacity: 0.7; }
+
+        /* Scrollbar tinh tế cho Admin */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body>
+    <header class="sticky-top">
+        <nav class="navbar navbar-expand-lg navbar-dark admin-navbar">
+            <div class="container-fluid">
+                <a class="navbar-brand d-flex align-items-center" asp-area="Admin" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-shield-lock-fill me-2 fs-4"></i> DAYLIFOOD <span class="ms-1 opacity-50 fw-light">ADMIN</span>
+                </a>
+
+                <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav">
+                    <i class="bi bi-grid-fill"></i>
+                </button>
+
+                <div class="collapse navbar-collapse" id="adminNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                        <li class="nav-item">
+                            <a class="nav-link-admin @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")" 
+                               asp-area="Admin" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-speedometer2 me-1"></i> Tổng quan
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link-admin @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Applications" ? "active" : "")" 
+                               asp-area="Admin" asp-controller="Applications" asp-action="Index">
+                                <i class="bi bi-patch-check me-1"></i> Duyệt đơn
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link-admin @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Stores" ? "active" : "")" 
+                               asp-area="Admin" asp-controller="Stores" asp-action="Index">
+                                <i class="bi bi-shop me-1"></i> Cửa hàng
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link-admin @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Shippers" ? "active" : "")" 
+                               asp-area="Admin" asp-controller="Shippers" asp-action="Index">
+                                <i class="bi bi-bicycle me-1"></i> Shipper
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link-admin @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Category" ? "active" : "")" 
+                               asp-area="Admin" asp-controller="Category" asp-action="Index">
+                                <i class="bi bi-grid me-1"></i> Danh mục
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link-admin @(ViewContext.RouteData.Values["Controller"]?.ToString() == "DeliveryArea" ? "active" : "")" 
+                               asp-area="Admin" asp-controller="DeliveryArea" asp-action="Index">
+                                <i class="bi bi-geo-alt me-1"></i> Khu vực
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="d-flex align-items-center gap-4">
+                        <a class="text-white-50 text-decoration-none small d-none d-xl-block" asp-area="" asp-controller="Home" asp-action="Intro">
+                            <i class="bi bi-arrow-up-right-circle me-1"></i> Xem trang chủ
+                        </a>
+                        
+                        <div class="admin-profile-pill">
+                            <div class="admin-avatar-sm">D</div>
+                            <span class="text-white small fw-bold d-none d-md-block">Admin</span>
+                            <div class="vr mx-1 opacity-25" style="height: 15px; color: white;"></div>
+                            <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn p-0 btn-logout-admin">Thoát</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container main-admin-content">
+        @if (TempData["Message"] != null)
+        {
+            <div class="alert alert-success admin-alert shadow-sm mb-4" role="alert">
+                <i class="bi bi-check-circle-fill fs-5"></i>
+                <div class="flex-grow-1">@TempData["Message"]</div>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger admin-alert shadow-sm mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                <div class="flex-grow-1">@TempData["Error"]</div>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="mt-auto py-3 bg-white border-top text-center text-muted small">
+        <div class="container">
+            &copy; 2026 - <span class="fw-bold text-dark">DayliFood Admin Panel</span>. Thiết kế bởi đội ngũ DayliFood.
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Hiệu ứng tự động ẩn Alert sau 5 giây
+        $(document).ready(function() {
+            setTimeout(function() {
+                $(".admin-alert").fadeOut('slow');
+            }, 5000);
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

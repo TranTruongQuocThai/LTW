@@ -1,0 +1,519 @@
+<div id="dayli-chatbot" class="dayli-chatbot">
+    <button type="button" class="dayli-chatbot__toggle" id="dayliChatToggle" aria-label="Mở chatbot AI hỗ trợ">
+        <span class="dayli-chatbot__toggle-icon">🤖</span>
+        <span class="dayli-chatbot__toggle-label">AI hỗ trợ</span>
+        <span class="dayli-chatbot__badge" id="dayliChatBadge" style="display:none;">1</span>
+    </button>
+
+    <div class="dayli-chatbot__panel" id="dayliChatPanel" aria-hidden="true">
+        <!-- Header -->
+        <div class="dayli-chatbot__header">
+            <div class="dayli-chatbot__header-info">
+                <div class="dayli-chatbot__avatar">🍜</div>
+                <div>
+                    <div class="dayli-chatbot__title">DayliFood AI</div>
+                    <div class="dayli-chatbot__subtitle">
+                        <span class="dayli-chatbot__dot"></span> Luôn sẵn sàng hỗ trợ
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="dayli-chatbot__close" id="dayliChatClose" aria-label="Đóng chatbot">✕</button>
+        </div>
+
+        <!-- Messages -->
+        <div class="dayli-chatbot__messages" id="dayliChatMessages">
+            <div class="dayli-chatbot__bubble dayli-chatbot__bubble--bot">
+                <p class="mb-2">Xin chào! 👋 Mình là <strong>DayliFood AI</strong>, sẵn sàng giúp bạn:</p>
+                <ul class="mb-0 ps-3">
+                    <li>Gợi ý món ăn phù hợp</li>
+                    <li>Hướng dẫn đặt hàng & thanh toán</li>
+                    <li>Tư vấn quán ngon gần bạn</li>
+                </ul>
+            </div>
+            <!-- Quick replies -->
+            <div class="dayli-chatbot__quick-replies" id="dayliQuickReplies">
+                <button type="button" class="dayli-chatbot__quick-btn" data-msg="Có món nào dưới 50k không?">🍱 Món dưới 50k</button>
+                <button type="button" class="dayli-chatbot__quick-btn" data-msg="Giới thiệu quán ngon cho tôi">🏪 Quán ngon</button>
+                <button type="button" class="dayli-chatbot__quick-btn" data-msg="Hướng dẫn thanh toán VNPay và Momo">💳 Thanh toán</button>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <form id="dayliChatForm" class="dayli-chatbot__form" autocomplete="off">
+            <div class="dayli-chatbot__input-wrap">
+                <textarea id="dayliChatInput" class="dayli-chatbot__input"
+                          rows="1" placeholder="Nhập câu hỏi..." maxlength="1000"
+                          aria-label="Nhập câu hỏi cho chatbot"></textarea>
+            </div>
+            <button type="submit" class="dayli-chatbot__send" aria-label="Gửi">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </button>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* ── Container ──────────────────────────────────────────── */
+    .dayli-chatbot {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        z-index: 1080;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 12px;
+    }
+
+    /* ── Toggle Button ──────────────────────────────────────── */
+    .dayli-chatbot__toggle {
+        position: relative;
+        border: none;
+        border-radius: 999px;
+        padding: 14px 20px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .dayli-chatbot__toggle:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(16, 185, 129, 0.5);
+    }
+    .dayli-chatbot__toggle-icon { font-size: 1.2rem; }
+    .dayli-chatbot__badge {
+        position: absolute;
+        top: -6px; right: -6px;
+        background: #ef4444;
+        color: #fff;
+        border-radius: 999px;
+        font-size: 0.65rem;
+        font-weight: 800;
+        width: 18px; height: 18px;
+        display: flex; align-items: center; justify-content: center;
+        border: 2px solid #fff;
+    }
+
+    /* ── Panel ──────────────────────────────────────────────── */
+    .dayli-chatbot__panel {
+        width: min(400px, calc(100vw - 32px));
+        height: 560px;
+        background: #ffffff;
+        border-radius: 20px;
+        overflow: hidden;
+        display: none;
+        flex-direction: column;
+        box-shadow: 0 20px 60px rgba(15, 23, 42, 0.15), 0 0 0 1px rgba(15, 23, 42, 0.05);
+        animation: chatSlideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .dayli-chatbot__panel.is-open { display: flex; }
+
+    @@keyframes chatSlideUp {
+        from { opacity: 0; transform: translateY(20px) scale(0.95); }
+        to   { opacity: 1; transform: translateY(0)    scale(1); }
+    }
+
+    /* ── Header ─────────────────────────────────────────────── */
+    .dayli-chatbot__header {
+        padding: 16px 18px;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-shrink: 0;
+    }
+    .dayli-chatbot__header-info { display: flex; align-items: center; gap: 12px; }
+    .dayli-chatbot__avatar {
+        width: 40px; height: 40px;
+        background: rgba(16, 185, 129, 0.2);
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.3rem;
+    }
+    .dayli-chatbot__title { font-weight: 700; font-size: 0.95rem; line-height: 1.2; }
+    .dayli-chatbot__subtitle {
+        font-size: 0.72rem;
+        opacity: 0.7;
+        display: flex; align-items: center; gap: 5px; margin-top: 2px;
+    }
+    .dayli-chatbot__dot {
+        width: 7px; height: 7px;
+        background: #10b981;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    @@keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50%       { opacity: 0.4; }
+    }
+    .dayli-chatbot__close {
+        background: rgba(255,255,255,0.1);
+        border: none; color: #fff;
+        border-radius: 8px;
+        width: 30px; height: 30px;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; font-size: 0.8rem;
+        transition: background 0.2s;
+    }
+    .dayli-chatbot__close:hover { background: rgba(255,255,255,0.2); }
+
+    /* ── Messages ───────────────────────────────────────────── */
+    .dayli-chatbot__messages {
+        flex: 1;
+        padding: 16px;
+        overflow-y: auto;
+        background: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        scroll-behavior: smooth;
+    }
+
+    /* ── Bubbles ─────────────────────────────────────────────── */
+    .dayli-chatbot__bubble {
+        max-width: 88%;
+        padding: 12px 14px;
+        border-radius: 18px;
+        font-size: 0.88rem;
+        line-height: 1.5;
+        animation: bubblePop 0.2s ease;
+    }
+    @@keyframes bubblePop {
+        from { opacity: 0; transform: scale(0.9); }
+        to   { opacity: 1; transform: scale(1); }
+    }
+    .dayli-chatbot__bubble--bot {
+        align-self: flex-start;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-bottom-left-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .dayli-chatbot__bubble--user {
+        align-self: flex-end;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: #fff;
+        border-bottom-right-radius: 4px;
+    }
+    .dayli-chatbot__bubble--loading {
+        align-self: flex-start;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-bottom-left-radius: 4px;
+        display: flex; align-items: center; gap: 6px;
+        padding: 14px 18px;
+    }
+    .dayli-chatbot__typing span {
+        width: 7px; height: 7px;
+        background: #94a3b8;
+        border-radius: 50%;
+        display: inline-block;
+        animation: typing 1.3s infinite ease-in-out;
+    }
+    .dayli-chatbot__typing span:nth-child(2) { animation-delay: 0.2s; }
+    .dayli-chatbot__typing span:nth-child(3) { animation-delay: 0.4s; }
+    @@keyframes typing {
+        0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; }
+        40%            { transform: scale(1);   opacity: 1; }
+    }
+
+    /* ── Product Cards ───────────────────────────────────────── */
+    .dayli-chatbot__products {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 10px;
+    }
+    .dayli-chatbot__product-card {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-radius: 12px;
+        padding: 10px 12px;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+    .dayli-chatbot__product-card:hover {
+        background: #dcfce7;
+        border-color: #86efac;
+        transform: translateX(3px);
+        color: inherit;
+    }
+    .dayli-chatbot__product-img {
+        width: 46px; height: 46px;
+        border-radius: 10px;
+        object-fit: cover;
+        background: #e2e8f0;
+        flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.4rem;
+    }
+    .dayli-chatbot__product-info { flex: 1; min-width: 0; }
+    .dayli-chatbot__product-name {
+        font-weight: 700; font-size: 0.82rem;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .dayli-chatbot__product-meta { font-size: 0.72rem; color: #64748b; }
+    .dayli-chatbot__product-price { font-weight: 800; color: #059669; font-size: 0.85rem; }
+    .dayli-chatbot__product-arrow { color: #10b981; font-size: 0.9rem; }
+
+    /* ── Quick Replies ───────────────────────────────────────── */
+    .dayli-chatbot__quick-replies {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-self: flex-start;
+    }
+    .dayli-chatbot__quick-btn {
+        border: 1px solid #d1fae5;
+        background: #f0fdf4;
+        color: #059669;
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+    .dayli-chatbot__quick-btn:hover {
+        background: #10b981;
+        color: #fff;
+        border-color: #10b981;
+    }
+
+    /* ── Input Form ──────────────────────────────────────────── */
+    .dayli-chatbot__form {
+        display: flex;
+        align-items: flex-end;
+        gap: 8px;
+        padding: 12px 14px;
+        border-top: 1px solid #f1f5f9;
+        background: #fff;
+        flex-shrink: 0;
+    }
+    .dayli-chatbot__input-wrap { flex: 1; }
+    .dayli-chatbot__input {
+        width: 100%;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 10px 14px;
+        font-size: 0.875rem;
+        resize: none;
+        outline: none;
+        max-height: 120px;
+        overflow-y: auto;
+        transition: border-color 0.2s;
+        font-family: inherit;
+        line-height: 1.4;
+    }
+    .dayli-chatbot__input:focus { border-color: #10b981; }
+    .dayli-chatbot__send {
+        width: 40px; height: 40px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: #fff;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: transform 0.15s, opacity 0.15s;
+    }
+    .dayli-chatbot__send:hover { transform: scale(1.08); }
+    .dayli-chatbot__send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* ── Mobile ──────────────────────────────────────────────── */
+    @@media (max-width: 576px) {
+        .dayli-chatbot { right: 12px; left: 12px; bottom: 12px; }
+        .dayli-chatbot__toggle { width: 100%; justify-content: center; }
+        .dayli-chatbot__panel { width: 100%; height: 75vh; }
+    }
+</style>
+
+<script>
+    (() => {
+        const toggle   = document.getElementById('dayliChatToggle');
+        const closeBtn = document.getElementById('dayliChatClose');
+        const panel    = document.getElementById('dayliChatPanel');
+        const form     = document.getElementById('dayliChatForm');
+        const input    = document.getElementById('dayliChatInput');
+        const messages = document.getElementById('dayliChatMessages');
+        const badge    = document.getElementById('dayliChatBadge');
+        const quickReplies = document.getElementById('dayliQuickReplies');
+
+        let isOpen = false;
+
+        const openPanel = () => {
+            isOpen = true;
+            panel.classList.add('is-open');
+            panel.setAttribute('aria-hidden', 'false');
+            badge.style.display = 'none';
+            scrollToBottom();
+            input.focus();
+        };
+
+        const closePanel = () => {
+            isOpen = false;
+            panel.classList.remove('is-open');
+            panel.setAttribute('aria-hidden', 'true');
+        };
+
+        const scrollToBottom = () => {
+            setTimeout(() => { messages.scrollTop = messages.scrollHeight; }, 50);
+        };
+
+        toggle?.addEventListener('click', () => isOpen ? closePanel() : openPanel());
+        closeBtn?.addEventListener('click', closePanel);
+
+        // Auto-resize textarea
+        input?.addEventListener('input', () => {
+            input.style.height = 'auto';
+            input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+        });
+
+        // Enter to send, Shift+Enter for newline
+        input?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+            }
+        });
+
+        // Quick reply buttons
+        quickReplies?.querySelectorAll('.dayli-chatbot__quick-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const msg = btn.dataset.msg;
+                if (msg) {
+                    input.value = msg;
+                    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+                    quickReplies.style.display = 'none';
+                }
+            });
+        });
+
+        const appendUserBubble = (text) => {
+            const div = document.createElement('div');
+            div.className = 'dayli-chatbot__bubble dayli-chatbot__bubble--user';
+            div.textContent = text;
+            messages.appendChild(div);
+            scrollToBottom();
+        };
+
+        const appendLoadingBubble = () => {
+            const div = document.createElement('div');
+            div.className = 'dayli-chatbot__bubble dayli-chatbot__bubble--loading';
+            div.innerHTML = '<div class="dayli-chatbot__typing"><span></span><span></span><span></span></div>';
+            messages.appendChild(div);
+            scrollToBottom();
+            return div;
+        };
+
+        const renderMarkdown = (text) => {
+            return text
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.+?)\*/g,     '<em>$1</em>')
+                .replace(/\n/g,            '<br>');
+        };
+
+        const formatPrice = (price) =>
+            new Intl.NumberFormat('vi-VN').format(price) + ' đ';
+
+        const renderProductCard = (product) => {
+            const card = document.createElement('a');
+            card.href      = product.url || `/Home/Index?q=${encodeURIComponent(product.name)}`;
+            card.className = 'dayli-chatbot__product-card';
+            card.target    = '_blank';
+            card.rel       = 'noopener';
+
+            const imgHtml = product.imageUrl
+                ? `<img src="${product.imageUrl}" alt="${product.name}" class="dayli-chatbot__product-img" onerror="this.outerHTML='<div class=\\'dayli-chatbot__product-img\\'>🍽️</div>'">`
+                : `<div class="dayli-chatbot__product-img">🍽️</div>`;
+
+            card.innerHTML = `
+                ${imgHtml}
+                <div class="dayli-chatbot__product-info">
+                    <div class="dayli-chatbot__product-name">${product.name}</div>
+                    <div class="dayli-chatbot__product-meta">${product.storeName}</div>
+                    <div class="dayli-chatbot__product-price">${formatPrice(product.price)}</div>
+                </div>
+                <span class="dayli-chatbot__product-arrow">→</span>
+            `;
+            return card;
+        };
+
+        const appendBotResponse = (text, products) => {
+            const div = document.createElement('div');
+            div.className = 'dayli-chatbot__bubble dayli-chatbot__bubble--bot';
+            div.innerHTML = renderMarkdown(text);
+
+            if (products && products.length > 0) {
+                const grid = document.createElement('div');
+                grid.className = 'dayli-chatbot__products';
+                products.forEach(p => grid.appendChild(renderProductCard(p)));
+                div.appendChild(grid);
+            }
+
+            messages.appendChild(div);
+            scrollToBottom();
+        };
+
+        form?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = input.value.trim();
+            if (!message) return;
+
+            appendUserBubble(message);
+            input.value = '';
+            input.style.height = 'auto';
+
+            const sendBtn = form.querySelector('.dayli-chatbot__send');
+            if (sendBtn) sendBtn.disabled = true;
+
+            const loading = appendLoadingBubble();
+
+            try {
+                const res = await fetch('/api/chatbot', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+                const data = await res.json();
+                loading.remove();
+
+                if (res.ok) {
+                    appendBotResponse(
+                        data.answer || 'Mình chưa tạo được câu trả lời. Bạn thử hỏi lại nhé.',
+                        data.products || []
+                    );
+                } else {
+                    appendBotResponse(data.message || 'Có lỗi xảy ra. Bạn thử lại sau nhé.', []);
+                }
+            } catch {
+                loading.remove();
+                appendBotResponse('Chatbot đang bận. Vui lòng thử lại sau vài giây.', []);
+            } finally {
+                if (sendBtn) sendBtn.disabled = false;
+                input.focus();
+            }
+        });
+
+        // Hiển thị badge khi panel đóng
+        const observer = new MutationObserver(() => {
+            if (!isOpen) badge.style.display = 'flex';
+        });
+
+    })();
+</script>

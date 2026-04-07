@@ -1,0 +1,38 @@
+@model List<Daylifood.Models.Order>
+@using Daylifood.Models
+@{
+    ViewData["Title"] = "Đơn hàng cửa hàng";
+}
+<h1 class="mb-4">Đơn hàng có sản phẩm của bạn</h1>
+@foreach (var o in Model)
+{
+    <div class="card mb-3 shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <span>Đơn #@o.Id — @o.Status.ToVietnamese()</span>
+            <span class="text-muted small">@o.CreatedAt.ToLocalTime().ToString("g")</span>
+        </div>
+        <div class="card-body">
+            <p><strong>Khách:</strong> @o.Buyer.Email</p>
+            <p><strong>Khu vực:</strong> @o.DeliveryArea.Name — @o.DeliveryAddress</p>
+            <ul>
+                @foreach (var i in o.OrderItems)
+                {
+                    <li>@i.Product.Name × @i.Quantity — @((i.Price * i.Quantity).ToString("N0")) đ</li>
+                }
+            </ul>
+            <p class="mb-3"><strong>Tổng đơn:</strong> @o.TotalPrice.ToString("N0") đ</p>
+            @if (o.Status == OrderStatus.Pending)
+            {
+                <form asp-action="ConfirmOrder" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@o.Id" />
+                    <button type="submit" class="btn btn-success">Xác nhận đơn</button>
+                </form>
+            }
+        </div>
+    </div>
+}
+@if (!Model.Any())
+{
+    <p class="text-muted">Chưa có đơn hàng.</p>
+}

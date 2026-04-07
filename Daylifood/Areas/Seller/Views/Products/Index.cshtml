@@ -1,0 +1,212 @@
+@model List<Daylifood.Models.Product>
+@using Daylifood.Models
+@{
+    ViewData["Title"] = "Quản lý thực đơn";
+    var lowStockCount = Model.Count(p => p.Stock <= 5 && p.Stock > 0);
+    var outOfStockCount = Model.Count(p => p.Stock == 0);
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Lexend:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<div class="seller-products-wrapper py-4">
+    <div class="container">
+        
+        <div class="d-flex flex-wrap justify-content-between align-items-end mb-5 animate-fade-in">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-2">
+                        <li class="breadcrumb-item"><a asp-area="Seller" asp-controller="Home" asp-action="Index" class="text-decoration-none text-muted">Kênh người bán</a></li>
+                        <li class="breadcrumb-item active fw-bold text-orange" aria-current="page">Quản lý thực đơn</li>
+                    </ol>
+                </nav>
+                <h1 class="fw-bold text-dark-blue family-lexend mb-0">Danh sách món ăn</h1>
+            </div>
+            
+            <div class="mt-3 mt-md-0">
+                <a class="btn btn-add-premium rounded-pill px-4 py-2 fw-bold shadow-orange" asp-action="Create">
+                    <i class="bi bi-plus-circle-fill me-2"></i>THÊM MÓN MỚI
+                </a>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4 animate-fade-in" style="animation-delay: 0.1s">
+            <div class="col-6 col-md-3">
+                <div class="mini-stat-card shadow-sm border-start border-primary border-4">
+                    <div class="small text-muted fw-bold">TỔNG CỘNG</div>
+                    <div class="fs-4 fw-800 text-dark-blue">@Model.Count</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="mini-stat-card shadow-sm border-start border-warning border-4">
+                    <div class="small text-muted fw-bold">SẮP HẾT (≤5)</div>
+                    <div class="fs-4 fw-800 text-warning">@lowStockCount</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="mini-stat-card shadow-sm border-start border-danger border-4">
+                    <div class="small text-muted fw-bold">ĐÃ HẾT HÀNG</div>
+                    <div class="fs-4 fw-800 text-danger">@outOfStockCount</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="mini-stat-card shadow-sm border-start border-emerald border-4">
+                    <div class="small text-muted fw-bold">ĐANG HIỂN THỊ</div>
+                    <div class="fs-4 fw-800 text-emerald">@Model.Count(p => p.IsActive)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-2xl rounded-5 overflow-hidden animate-slide-up">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light-soft">
+                        <tr>
+                            <th class="ps-4 py-3 text-uppercase ls-1" style="width: 100px;">Hình ảnh</th>
+                            <th class="py-3 text-uppercase ls-1">Tên món & Danh mục</th>
+                            <th class="py-3 text-uppercase ls-1">Giá bán</th>
+                            <th class="py-3 text-uppercase ls-1 text-center">Tồn kho</th>
+                            <th class="pe-4 py-3 text-uppercase ls-1 text-end">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model)
+                        {
+                            <tr class="product-row">
+                                <td class="ps-4">
+                                    <div class="img-container shadow-sm rounded-3">
+                                        <img src="@(p.ImageUrl ?? "/images/placeholder.svg")" alt="@p.Name" class="img-fluid" />
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold text-dark-blue mb-1">@p.Name</div>
+                                    <span class="badge bg-soft-primary text-primary x-small rounded-pill">
+                                        <i class="bi bi-tag-fill me-1"></i> @(p.Category?.Name ?? "Chưa phân loại")
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="fw-800 text-dark-blue">@p.Price.ToString("N0") <small>đ</small></div>
+                                </td>
+                                <td class="text-center">
+                                    @if (p.Stock == 0)
+                                    {
+                                        <span class="badge bg-soft-danger text-danger rounded-pill px-3">Hết hàng</span>
+                                    }
+                                    else if (p.Stock <= 5)
+                                    {
+                                        <span class="badge bg-soft-warning text-warning rounded-pill px-3">Chỉ còn @p.Stock</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-soft-emerald text-emerald rounded-pill px-3">@p.Stock sản phẩm</span>
+                                    }
+                                </td>
+                                <td class="pe-4 text-end">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a class="btn btn-action-icon edit" asp-action="Edit" asp-route-id="@p.Id" title="Sửa món">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </a>
+                                        <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirmDelete('@p.Name');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@p.Id" />
+                                            <button type="submit" class="btn btn-action-icon delete" title="Xóa món">
+                                                <i class="bi bi-trash3-fill"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                        
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="opacity-20 mb-3"><i class="bi bi-inbox display-1"></i></div>
+                                    <h5 class="text-muted">Thực đơn của quán bạn còn đang trống.</h5>
+                                    <p class="small text-muted">Nhấn "Thêm món mới" để bắt đầu kinh doanh nhé!</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --dark-blue: #0f172a;
+        --orange: #ff7e5f;
+        --orange-dark: #ff6b6b;
+        --emerald: #10b981;
+        --soft-bg: #f8fafc;
+        --soft-primary: #eff6ff;
+        --soft-emerald: #ecfdf5;
+        --soft-warning: #fffbeb;
+        --soft-danger: #fef2f2;
+    }
+
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--soft-bg); }
+    .family-lexend { font-family: 'Lexend', sans-serif; }
+    .fw-800 { font-weight: 800; }
+    .ls-1 { letter-spacing: 1px; font-size: 0.7rem; font-weight: 800; color: #94a3b8; }
+
+    /* Mini Stats */
+    .mini-stat-card { background: white; padding: 15px; rounded-radius: 15px; }
+
+    /* Image Styling */
+    .img-container { width: 60px; height: 60px; overflow: hidden; background: #fff; }
+    .img-container img { width: 100%; height: 100%; object-fit: cover; transition: 0.3s; }
+    .product-row:hover .img-container img { transform: scale(1.1); }
+
+    /* Table Custom */
+    .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05); }
+    .bg-light-soft { background-color: #fcfcfc; }
+    .product-row { transition: all 0.2s; }
+    .product-row:hover { background-color: #fafbfc; }
+
+    /* Action Buttons */
+    .btn-action-icon {
+        width: 36px; height: 36px; border-radius: 10px; border: none;
+        display: flex; align-items: center; justify-content: center;
+        transition: 0.3s; background: #f1f5f9; color: #64748b;
+    }
+    .btn-action-icon.edit:hover { background: var(--soft-primary); color: #2563eb; transform: scale(1.1); }
+    .btn-action-icon.delete:hover { background: var(--soft-danger); color: #ef4444; transform: scale(1.1); }
+
+    /* Add Button Gradient */
+    .btn-add-premium {
+        background: linear-gradient(45deg, var(--orange), var(--orange-dark));
+        color: white; border: none; transition: 0.3s;
+    }
+    .btn-add-premium:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255, 126, 95, 0.3); color: white; }
+
+    /* Badges */
+    .bg-soft-primary { background: var(--soft-primary); }
+    .bg-soft-emerald { background: var(--soft-emerald); color: var(--emerald) !important; }
+    .bg-soft-warning { background: var(--soft-warning); color: #d97706 !important; }
+    .bg-soft-danger { background: var(--soft-danger); color: #ef4444 !important; }
+
+    /* Animations */
+    @@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-up { animation: fadeInUp 0.7s ease-out both; }
+    .animate-fade-in { animation: fadeInUp 0.4s ease-out both; }
+    .x-small { font-size: 0.65rem; }
+</style>
+
+@section Scripts {
+    <script>
+        function confirmDelete(name) {
+            return confirm(`Bạn có chắc chắn muốn XÓA món "${name}" khỏi thực đơn chứ? Thao tác này không thể hoàn tác!`);
+        }
+
+        // Tự động ẩn các dòng khi xóa (hiệu ứng giả lập mượt)
+        document.querySelectorAll('.delete').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                // Logic xóa thực tế sẽ được server xử lý, ở đây chỉ thêm hiệu ứng nếu cần
+            });
+        });
+    </script>
+}

@@ -1,0 +1,211 @@
+@model List<Daylifood.Models.Order>
+@using Daylifood.Models
+@{
+    ViewData["Title"] = "Quản lý đơn hàng cửa hàng";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Lexend:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<div class="seller-orders-wrapper py-4">
+    <div class="container">
+        
+        <div class="mb-5 animate-fade-in">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a asp-area="Seller" asp-controller="Home" asp-action="Index" class="text-decoration-none text-muted">Kênh người bán</a></li>
+                    <li class="breadcrumb-item active fw-bold text-orange" aria-current="page">Đơn hàng của quán</li>
+                </ol>
+            </nav>
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <h1 class="fw-bold text-dark-blue family-lexend mb-0">Đơn hàng cần xử lý</h1>
+                <div class="order-count-pill shadow-sm">
+                    <i class="bi bi-bell-fill me-2 pulse-orange"></i>
+                    Bạn có <strong>@Model.Count(o => o.Status == OrderStatus.Pending) đơn mới</strong>
+                </div>
+            </div>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="empty-orders text-center py-5 rounded-5 bg-white shadow-sm border border-dashed animate-up">
+                <div class="mb-4 opacity-25">
+                    <i class="bi bi-clipboard-x-fill" style="font-size: 5rem;"></i>
+                </div>
+                <h4 class="fw-bold text-dark-blue">Hiện chưa có đơn hàng nào</h4>
+                <p class="text-muted">Đừng lo, hãy kiểm tra lại thực đơn và các chương trình khuyến mãi để thu hút khách nhé!</p>
+                <a asp-controller="Products" asp-action="Index" class="btn btn-outline-orange rounded-pill px-4 mt-2">Quản lý món ăn</a>
+            </div>
+        }
+        else
+        {
+            <div class="order-list-grid">
+                @foreach (var o in Model.OrderByDescending(x => x.CreatedAt))
+                {
+                    var statusKey = o.Status.ToString().ToLower();
+                    
+                    <div class="order-card-premium mb-4 animate-up shadow-sm">
+                        <div class="status-sidebar @statusKey"></div>
+                        
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
+                                <div>
+                                    <h5 class="fw-800 text-dark-blue mb-1">Đơn hàng #@o.Id</h5>
+                                    <span class="badge-status-pill @statusKey">
+                                        <i class="bi bi-dot fs-4"></i> @o.Status.ToVietnamese()
+                                    </span>
+                                </div>
+                                <div class="text-md-end">
+                                    <div class="small fw-bold text-muted text-uppercase mb-1">Thời gian đặt</div>
+                                    <div class="small text-dark fw-semibold">@o.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
+                                </div>
+                            </div>
+
+                            <div class="row g-4">
+                                <div class="col-md-5">
+                                    <div class="info-group p-3 rounded-4 bg-light h-100">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-person-circle text-primary me-2"></i>
+                                            <span class="fw-bold small text-dark-blue">KHÁCH HÀNG</span>
+                                        </div>
+                                        <div class="small text-dark fw-500 text-truncate mb-3">@o.Buyer.Email</div>
+                                        
+                                        <div class="d-flex align-items-center mb-1">
+                                            <i class="bi bi-geo-alt-fill text-danger me-2"></i>
+                                            <span class="fw-bold small text-dark-blue">ĐỊA CHỈ GIAO</span>
+                                        </div>
+                                        <div class="small text-muted mb-1 fw-semibold">@o.DeliveryArea.Name</div>
+                                        <div class="x-small text-muted fst-italic line-clamp-2">@o.DeliveryAddress</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-7">
+                                    <div class="info-group">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <i class="bi bi-receipt text-orange me-2"></i>
+                                            <span class="fw-bold small text-dark-blue">CHI TIẾT MÓN ĂN</span>
+                                        </div>
+                                        <div class="order-items-scroll">
+                                            @foreach (var i in o.OrderItems)
+                                            {
+                                                <div class="item-line d-flex justify-content-between align-items-center py-2 border-bottom border-light">
+                                                    <div class="item-name">
+                                                        <span class="badge bg-soft-orange text-orange me-2 rounded-pill">x@i.Quantity</span>
+                                                        <span class="fw-semibold text-dark-blue small">@i.Product.Name</span>
+                                                    </div>
+                                                    <div class="item-price fw-bold text-dark-blue small">
+                                                        @((i.Price * i.Quantity).ToString("N0")) <small>đ</small>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center mt-3 p-3 rounded-4 bg-soft-primary">
+                                            <span class="fw-bold text-dark-blue small">TỔNG DOANH THU:</span>
+                                            <span class="fs-4 fw-800 text-primary">@o.TotalPrice.ToString("N0") <small class="fs-6">đ</small></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (o.Status == OrderStatus.Pending)
+                            {
+                                <div class="mt-4 pt-3 border-top d-flex justify-content-end">
+                                    <form asp-action="ConfirmOrder" method="post" onsubmit="return confirm('Bạn đã sẵn sàng chuẩn bị món cho đơn hàng #@o.Id chứ?')">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@o.Id" />
+                                        <button type="submit" class="btn btn-confirm-order px-5 py-2 rounded-pill fw-bold shadow-sm">
+                                            XÁC NHẬN & CHUẨN BỊ MÓN <i class="bi bi-check-all ms-1"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    :root {
+        --dark-blue: #1e293b;
+        --orange: #ff7e5f;
+        --emerald: #10b981;
+        --soft-orange: #fff1ed;
+        --soft-primary: #eff6ff;
+    }
+
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+    .family-lexend { font-family: 'Lexend', sans-serif; }
+    .fw-800 { font-weight: 800; }
+    .fw-500 { font-weight: 500; }
+    .text-orange { color: var(--orange); }
+    .text-dark-blue { color: var(--dark-blue); }
+
+    /* Header Count Pill */
+    .order-count-pill {
+        background: white; border: 1px solid #f1f5f9; padding: 10px 25px;
+        border-radius: 50px; font-size: 0.85rem; color: var(--dark-blue);
+    }
+    .pulse-orange { color: var(--orange); animation: pulse-ring 2s infinite; }
+
+    /* Premium Order Card */
+    .order-card-premium {
+        background: white; border: none; border-radius: 30px;
+        position: relative; overflow: hidden; transition: 0.3s;
+    }
+    .order-card-premium:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.06) !important; }
+
+    /* Status Sidebar Color */
+    .status-sidebar { position: absolute; left: 0; top: 0; bottom: 0; width: 8px; }
+    .status-sidebar.pending { background: #f59e0b; }
+    .status-sidebar.processing { background: #3b82f6; }
+    .status-sidebar.shipping { background: #8b5cf6; }
+    .status-sidebar.completed { background: var(--emerald); }
+    .status-sidebar.cancelled { background: #ef4444; }
+
+    /* Status Badges */
+    .badge-status-pill { font-size: 0.7rem; font-weight: 800; padding: 2px 15px; border-radius: 50px; display: inline-flex; align-items: center; text-transform: uppercase; letter-spacing: 0.5px; }
+    .badge-status-pill.pending { background: #fffbeb; color: #b45309; }
+    .badge-status-pill.processing { background: #eff6ff; color: #1d4ed8; }
+    .badge-status-pill.completed { background: #ecfdf5; color: #047857; }
+
+    /* Info Group */
+    .bg-soft-orange { background: var(--soft-orange); }
+    .bg-soft-primary { background: var(--soft-primary); }
+    .item-line:last-child { border-bottom: none !important; }
+    .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+    /* Confirm Button */
+    .btn-confirm-order {
+        background: linear-gradient(45deg, var(--emerald), #059669);
+        color: white; border: none; transition: 0.3s;
+    }
+    .btn-confirm-order:hover { transform: scale(1.02); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3); color: white; }
+
+    .btn-outline-orange { border: 2px solid var(--orange); color: var(--orange); font-weight: 700; transition: 0.3s; }
+    .btn-outline-orange:hover { background: var(--orange); color: white; }
+
+    /* Animations */
+    @@keyframes pulse-ring { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+    @@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-up { animation: fadeInUp 0.7s ease-out both; }
+    .animate-fade-in { animation: fadeInUp 0.4s ease-out both; }
+    .x-small { font-size: 0.7rem; }
+</style>
+
+@section Scripts {
+    <script>
+        // Hiệu ứng hiện dần các thẻ đơn hàng
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.order-card-premium');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 120);
+            });
+        });
+    </script>
+}

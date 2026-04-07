@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Kênh Người Bán DayliFood</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lexend:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <style>
+        :root {
+            --seller-navy: #0f172a;
+            --seller-emerald: #10b981;
+            --seller-emerald-dark: #059669;
+            --seller-orange: #ff7e5f;
+            --bg-soft: #f8fafc;
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: var(--bg-soft);
+            color: #334155;
+            min-height: 100vh;
+        }
+
+        /* Navbar Style: Modern & Sticky */
+        .seller-navbar {
+            background-color: var(--seller-navy) !important;
+            padding: 0.8rem 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border-bottom: 2px solid var(--seller-emerald);
+        }
+
+        .navbar-brand {
+            font-family: 'Lexend', sans-serif;
+            font-weight: 800;
+            background: linear-gradient(45deg, #fff 40%, var(--seller-emerald));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.3rem;
+        }
+
+        /* Navigation Links */
+        .nav-link-seller {
+            color: rgba(255,255,255,0.7) !important;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0.6rem 1.2rem !important;
+            margin: 0 0.2rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link-seller:hover {
+            color: #fff !important;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .nav-link-seller.active {
+            color: #fff !important;
+            background: var(--seller-emerald) !important;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Store Profile Pill */
+        .store-profile-pill {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 5px 15px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .store-avatar-mini {
+            width: 30px; height: 30px;
+            background: var(--seller-emerald);
+            color: white;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 0.8rem;
+        }
+
+        /* Alert System: Cao cấp */
+        .seller-alert {
+            border: none;
+            border-radius: 18px;
+            padding: 1.2rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideInDown 0.5s ease-out;
+        }
+
+        @@keyframes slideInDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Main Content Animation */
+        .main-content-area {
+            animation: fadeIn 0.6s ease-in-out;
+            padding-top: 2rem;
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .btn-logout-seller {
+            font-weight: 700;
+            color: #ffb199 !important;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: 0.3s;
+        }
+        .btn-logout-seller:hover { color: var(--seller-orange) !important; opacity: 0.8; }
+
+        footer {
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            padding: 1.5rem 0;
+            margin-top: 4rem;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <header class="sticky-top">
+        <nav class="navbar navbar-expand-lg navbar-dark seller-navbar">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="Seller" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-shop me-2"></i> DAYLIFOOD <span class="opacity-50 fw-light">SELLER</span>
+                </a>
+
+                <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#sellerNav">
+                    <i class="bi bi-list-nested fs-2"></i>
+                </button>
+
+                <div class="collapse navbar-collapse" id="sellerNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                        <li class="nav-item">
+                            <a class="nav-link-seller @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Home" ? "active" : "")" 
+                               asp-area="Seller" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-house-door me-1"></i> Tổng quan
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link-seller @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Products" ? "active" : "")" 
+                               asp-area="Seller" asp-controller="Products" asp-action="Index">
+                                <i class="bi bi-box-seam me-1"></i> Sản phẩm
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link-seller @(ViewContext.RouteData.Values["Action"]?.ToString() == "Orders" ? "active" : "")" 
+                               asp-area="Seller" asp-controller="Home" asp-action="Orders">
+                                <i class="bi bi-receipt me-1"></i> Đơn hàng
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link-seller @(ViewContext.RouteData.Values["Action"]?.ToString() == "Revenue" ? "active" : "")" 
+                               asp-area="Seller" asp-controller="Home" asp-action="Revenue">
+                                <i class="bi bi-graph-up-arrow me-1"></i> Doanh thu
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="d-flex align-items-center gap-4">
+                        <a class="text-white-50 text-decoration-none small d-none d-xl-block" asp-area="" asp-controller="Home" asp-action="Intro">
+                            Trang chủ <i class="bi bi-box-arrow-up-right ms-1"></i>
+                        </a>
+                        
+                        <div class="store-profile-pill">
+                            <div class="store-avatar-mini shadow-sm">S</div>
+                            <span class="text-white small fw-bold d-none d-md-block">Đối tác DayliFood</span>
+                            <div class="vr mx-2 opacity-25" style="height: 15px; color: white;"></div>
+                            <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn p-0 btn-logout-seller shadow-none border-0">Thoát</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container main-content-area">
+        <div class="alert-container">
+            @if (TempData["Message"] != null)
+            {
+                <div class="alert alert-success seller-alert mb-4">
+                    <i class="bi bi-check-circle-fill fs-4 text-emerald"></i>
+                    <div class="flex-grow-1 fw-600">@TempData["Message"]</div>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger seller-alert mb-4">
+                    <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+                    <div class="flex-grow-1 fw-600">@TempData["Error"]</div>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert"></button>
+                </div>
+            }
+        </div>
+
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="text-center">
+        <div class="container">
+            <p class="mb-1 fw-bold">DAYLIFOOD SELLER CENTER</p>
+            <p class="mb-0 x-small">Hệ thống quản lý gian hàng thông minh &copy; 2026. Phát triển bởi đội ngũ DayliFood.</p>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Tự động ẩn thông báo sau 4 giây để bạn không phải bấm tắt
+        $(document).ready(function() {
+            setTimeout(function() {
+                $(".seller-alert").fadeOut('slow');
+            }, 4000);
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

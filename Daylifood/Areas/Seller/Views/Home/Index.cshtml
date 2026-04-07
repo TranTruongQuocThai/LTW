@@ -1,0 +1,197 @@
+@model Daylifood.Models.Store
+@{
+    ViewData["Title"] = "Tổng quan cửa hàng";
+    var store = ViewBag.Store as Daylifood.Models.Store;
+    var revenue = (decimal)ViewBag.Revenue;
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<div class="seller-dashboard py-4">
+    <div class="container">
+        
+        <div class="welcome-hero p-5 rounded-5 shadow-sm text-white mb-5 animate-fade-in">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <span class="badge rounded-pill bg-white text-dark px-3 py-2 mb-3 fw-bold small">KÊNH NGƯỜI BÁN</span>
+                    <h1 class="display-5 fw-800 family-comfortaa mb-2">Xin chào, @(store?.Name ?? "Chủ quán")!</h1>
+                    <p class="opacity-75 mb-0">Hôm nay là một ngày tuyệt vời để bùng nổ doanh số. Kiểm tra các con số bên dưới nhé!</p>
+                </div>
+                <div class="col-md-4 text-end d-none d-md-block">
+                    <div class="hero-icon-box">
+                        <i class="bi bi-shop-window"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-6 col-xl-4 animate-up" style="animation-delay: 0.1s">
+                <div class="stat-card-modern shadow-sm h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="icon-circle bg-soft-primary text-primary">
+                                <i class="bi bi-box-seam-fill"></i>
+                            </div>
+                            <a asp-area="Seller" asp-controller="Products" asp-action="Index" class="btn-manage">Quản lý <i class="bi bi-arrow-right"></i></a>
+                        </div>
+                        <h6 class="text-muted fw-bold ls-1 small">TỔNG SẢN PHẨM</h6>
+                        <h2 class="fw-800 text-dark-blue mb-0">@ViewBag.ProductCount <small class="fs-6 fw-normal opacity-50">món</small></h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-4 animate-up" style="animation-delay: 0.2s">
+                <div class="stat-card-modern shadow-sm h-100 border-start border-emerald border-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="icon-circle bg-soft-emerald text-emerald">
+                                <i class="bi bi-cash-stack"></i>
+                            </div>
+                            <a asp-area="Seller" asp-controller="Home" asp-action="Revenue" class="btn-manage text-emerald">Chi tiết <i class="bi bi-graph-up-arrow"></i></a>
+                        </div>
+                        <h6 class="text-muted fw-bold ls-1 small">DOANH THU (ĐÃ GIAO)</h6>
+                        <h2 class="fw-800 text-dark-blue mb-0 text-emerald-dark">@revenue.ToString("N0") <small class="fs-6 fw-normal">đ</small></h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12 col-xl-4 animate-up" style="animation-delay: 0.3s">
+                <div class="stat-card-modern shadow-sm h-100 bg-dark-blue text-white">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="icon-circle bg-white-10 text-white">
+                                <i class="bi bi-receipt-cutoff"></i>
+                            </div>
+                            <span class="badge bg-orange rounded-pill small">Thời gian thực</span>
+                        </div>
+                        <h6 class="text-white-50 fw-bold ls-1 small">ĐƠN HÀNG MỚI</h6>
+                        <h2 class="fw-800 mb-0">Chờ duyệt <i class="bi bi-chevron-right fs-4 opacity-50 ms-2"></i></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-actions-section animate-slide-up">
+            <h5 class="fw-bold text-dark-blue mb-4"><i class="bi bi-lightning-charge-fill text-orange me-2"></i>Thao tác nhanh</h5>
+            <div class="row g-3">
+                <div class="col-6 col-md-3">
+                    <a asp-area="Seller" asp-controller="Products" asp-action="Create" class="action-btn-pill">
+                        <i class="bi bi-plus-circle"></i> Thêm món mới
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a asp-area="Seller" asp-controller="Home" asp-action="Orders" class="action-btn-pill">
+                        <i class="bi bi-clock-history"></i> Xem đơn hàng
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="#" class="action-btn-pill">
+                        <i class="bi bi-gear"></i> Cài đặt quán
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="#" class="action-btn-pill">
+                        <i class="bi bi-megaphone"></i> Khuyến mãi
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --dark-blue: #0f172a;
+        --emerald: #10b981;
+        --emerald-dark: #059669;
+        --orange: #ff7e5f;
+        --soft-primary: #eff6ff;
+        --soft-emerald: #ecfdf5;
+    }
+
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+    .family-comfortaa { font-family: 'Comfortaa', cursive; }
+    .fw-800 { font-weight: 800; }
+    .text-dark-blue { color: var(--dark-blue); }
+    .bg-dark-blue { background-color: var(--dark-blue); }
+    .text-emerald { color: var(--emerald); }
+    .text-emerald-dark { color: var(--emerald-dark); }
+    .text-orange { color: var(--orange); }
+    .bg-orange { background-color: var(--orange); }
+
+    /* Welcome Hero */
+    .welcome-hero {
+        background: linear-gradient(135deg, var(--dark-blue) 0%, #334155 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    .hero-icon-box {
+        font-size: 6rem;
+        color: rgba(255,255,255,0.05);
+        transform: rotate(-15deg);
+    }
+
+    /* Stat Cards */
+    .stat-card-modern {
+        background: white;
+        border: none;
+        border-radius: 30px;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .stat-card-modern:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.06) !important;
+    }
+
+    .icon-circle {
+        width: 50px; height: 50px;
+        border-radius: 15px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem;
+    }
+    .bg-soft-primary { background: var(--soft-primary); }
+    .bg-soft-emerald { background: var(--soft-emerald); }
+    .bg-white-10 { background: rgba(255,255,255,0.1); }
+
+    .btn-manage {
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-decoration: none;
+        color: var(--dark-blue);
+        transition: 0.3s;
+    }
+    .btn-manage:hover { opacity: 0.7; transform: translateX(5px); }
+
+    /* Action Pills */
+    .action-btn-pill {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        background: white;
+        padding: 15px;
+        border-radius: 20px;
+        text-decoration: none;
+        color: var(--dark-blue);
+        font-weight: 700;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        border: 1px solid #f1f5f9;
+        transition: all 0.3s;
+    }
+    .action-btn-pill:hover {
+        background: var(--orange);
+        color: white;
+        border-color: var(--orange);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(255, 126, 95, 0.2);
+    }
+
+    /* Animations */
+    @@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-up { animation: fadeInUp 0.7s ease-out both; }
+    .animate-slide-up { animation: fadeInUp 0.6s ease-out both; }
+    .animate-fade-in { animation: fadeInUp 0.4s ease-out both; }
+</style>

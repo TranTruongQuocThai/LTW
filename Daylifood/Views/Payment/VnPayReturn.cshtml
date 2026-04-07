@@ -1,0 +1,93 @@
+@model Daylifood.ViewModels.VnPayReturnViewModel
+@using Daylifood.Models
+@{
+    ViewData["Title"] = "Kết quả thanh toán VNPay";
+
+    var title = !Model.Callback.IsSignatureValid
+        ? "Chữ ký giao dịch không hợp lệ"
+        : Model.Callback.IsSuccess
+            ? "Giao dịch VNPay đã được ngân hàng chấp nhận"
+            : "Giao dịch VNPay chưa thành công";
+
+    var description = !Model.Callback.IsSignatureValid
+        ? "Website không xác thực được dữ liệu trả về từ VNPay."
+        : Model.Callback.IsSuccess
+            ? "Nếu IPN đã gọi thành công, đơn hàng sẽ tự động chuyển sang trạng thái chờ quán xác nhận."
+            : "Đơn hàng sẽ được cập nhật theo kết quả callback/IPN của VNPay.";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-body p-4 p-lg-5">
+                    <div class="text-center mb-4">
+                        <div class="display-5 mb-3">
+                            @if (!Model.Callback.IsSignatureValid)
+                            {
+                                <span>⚠️</span>
+                            }
+                            else if (Model.Callback.IsSuccess)
+                            {
+                                <span>✅</span>
+                            }
+                            else
+                            {
+                                <span>❌</span>
+                            }
+                        </div>
+                        <h1 class="h3 fw-bold">@title</h1>
+                        <p class="text-muted mb-0">@description</p>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="border rounded-4 p-3 h-100">
+                                <div class="small text-muted">Mã đơn</div>
+                                <div class="fw-bold fs-5">@(Model.Order?.Id.ToString() ?? Model.Callback.OrderId.ToString())</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border rounded-4 p-3 h-100">
+                                <div class="small text-muted">Mã phản hồi VNPay</div>
+                                <div class="fw-bold fs-5">@Model.Callback.ResponseCode</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border rounded-4 p-3 h-100">
+                                <div class="small text-muted">Số tiền callback</div>
+                                <div class="fw-bold fs-5">@((Model.Callback.Amount / 100m).ToString("N0")) đ</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border rounded-4 p-3 h-100">
+                                <div class="small text-muted">Trạng thái đơn hiện tại</div>
+                                <div class="fw-bold fs-5">@(Model.Order?.Status.ToVietnamese() ?? "Chưa tải được đơn hàng")</div>
+                                @if (Model.Order != null)
+                                {
+                                    <div class="small text-muted">@Model.Order.PaymentStatus.ToVietnamese()</div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (Model.Callback.IsSuccess && Model.Order?.PaymentStatus != PaymentStatus.Paid)
+                    {
+                        <div class="alert alert-warning rounded-4 border-0 mb-4">
+                            Giao dịch đã được người dùng hoàn tất ở phía VNPay, nhưng hệ thống của bạn vẫn đang chờ IPN cập nhật. Khi test local, hãy public URL IPN bằng ngrok hoặc cloudflared để VNPay gọi về được.
+                        </div>
+                    }
+
+                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                        @if (Model.Order != null)
+                        {
+                            <a asp-controller="Order" asp-action="Detail" asp-route-id="@Model.Order.Id" class="btn btn-success rounded-pill px-4">Xem đơn hàng</a>
+                        }
+                        <a asp-controller="Order" asp-action="History" class="btn btn-outline-secondary rounded-pill px-4">Về lịch sử đơn</a>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-dark rounded-pill px-4">Tiếp tục mua sắm</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

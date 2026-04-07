@@ -1,0 +1,180 @@
+@model List<Daylifood.Models.DeliveryArea>
+@{
+    ViewData["Title"] = "Quản lý khu vực giao hàng";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<div class="admin-wrapper py-4">
+    <div class="container">
+        
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 animate-fade-in">
+            <div>
+                <h1 class="fw-bold text-dark-blue family-comfortaa mb-1">Khu vực giao hàng</h1>
+                <p class="text-muted small mb-0">Bạn đang quản lý vùng phủ sóng tại <span class="badge bg-soft-emerald text-emerald">@Model.Count khu vực</span></p>
+            </div>
+            <div class="mt-3 mt-md-0">
+                <a class="btn btn-emerald-gradient rounded-pill px-4 py-2 fw-bold shadow-emerald" asp-action="Create">
+                    <i class="bi bi-plus-circle-fill me-2"></i>THÊM KHU VỰC
+                </a>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-2xl rounded-5 overflow-hidden animate-slide-up">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4 py-3 text-uppercase ls-1 text-center" style="width: 100px;">Thứ tự</th>
+                            <th class="py-3 text-uppercase ls-1">Tên khu vực</th>
+                            <th class="py-3 text-uppercase ls-1 text-center">Trạng thái</th>
+                            <th class="pe-4 py-3 text-uppercase ls-1 text-end">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var a in Model.OrderBy(x => x.SortOrder))
+                        {
+                            <tr class="area-row">
+                                <td class="text-center">
+                                    <span class="sort-badge">@a.SortOrder</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="map-icon-mini me-3">
+                                            <i class="bi bi-geo-alt-fill"></i>
+                                        </div>
+                                        <div>
+                                            <span class="fw-bold text-dark-blue fs-6">@a.Name</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge rounded-pill bg-soft-emerald text-emerald px-3">
+                                        <i class="bi bi-check-circle-fill me-1"></i> Sẵn sàng
+                                    </span>
+                                </td>
+                                <td class="pe-4 text-end">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a class="btn btn-action edit" asp-action="Edit" asp-route-id="@a.Id" title="Cập nhật địa danh">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        
+                                        <form asp-action="Delete" method="post" class="d-inline" onsubmit="return confirmDelete('@a.Name');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@a.Id" />
+                                            <button type="submit" class="btn btn-action delete" title="Gỡ bỏ khu vực">
+                                                <i class="bi bi-trash3-fill"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-5">
+                                    <div class="opacity-25 mb-3">
+                                        <i class="bi bi-map-fill display-1"></i>
+                                    </div>
+                                    <h5 class="text-muted">Chưa có dữ liệu khu vực.</h5>
+                                    <p class="small text-muted">Bạn hãy nhấn "Thêm khu vực" để mở rộng bản đồ giao hàng nhé!</p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="mt-4 d-flex justify-content-center">
+            <div class="info-pill-light">
+                <i class="bi bi-info-circle me-2"></i>
+                Thứ tự sắp xếp ảnh hưởng đến việc hiển thị khu vực tại trang thanh toán của khách hàng.
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --emerald: #10b981;
+        --emerald-dark: #059669;
+        --dark-blue: #1e293b;
+        --soft-bg: #f8fafc;
+        --soft-emerald: #ecfdf5;
+    }
+
+    body { font-family: 'Lexend', sans-serif; background-color: var(--soft-bg); }
+    .family-comfortaa { font-family: 'Comfortaa', cursive; }
+    .text-emerald { color: var(--emerald); }
+    .ls-1 { letter-spacing: 1px; font-size: 0.7rem; font-weight: 800; color: #94a3b8; }
+
+    /* Shadow & Container */
+    .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05); }
+    .table thead th { border: none; background-color: #fcfcfc; }
+    .area-row { transition: all 0.2s; }
+    .area-row:hover { background-color: #fafbfc; }
+
+    /* Sort Badge */
+    .sort-badge {
+        width: 30px; height: 30px;
+        display: inline-flex; align-items: center; justify-content: center;
+        background: #f1f5f9; color: var(--dark-blue);
+        border-radius: 8px; font-weight: 800; font-size: 0.85rem;
+    }
+
+    /* Icon Box */
+    .map-icon-mini {
+        width: 38px; height: 38px;
+        background: var(--soft-emerald);
+        color: var(--emerald);
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    /* Action Buttons */
+    .btn-action {
+        width: 38px; height: 38px;
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        border: none; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        background: #f1f5f9;
+        color: #64748b;
+    }
+    .btn-action.edit:hover { background-color: #e0f2fe; color: #0284c7; transform: scale(1.1); }
+    .btn-action.delete:hover { background-color: #fee2e2; color: #ef4444; transform: scale(1.1); }
+
+    /* Gradient Button */
+    .btn-emerald-gradient {
+        background: linear-gradient(135deg, var(--emerald), var(--emerald-dark));
+        color: white; border: none; transition: all 0.3s;
+    }
+    .btn-emerald-gradient:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.25); color: white; }
+
+    /* Status Badge Custom */
+    .bg-soft-emerald { background-color: var(--soft-emerald); }
+
+    /* Info Pill */
+    .info-pill-light {
+        background: white; border: 1px solid #e2e8f0;
+        padding: 8px 20px; border-radius: 50px;
+        font-size: 0.8rem; color: #64748b; font-weight: 500;
+    }
+
+    /* Animations */
+    @@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-slide-up { animation: fadeInUp 0.6s ease-out both; }
+    .animate-fade-in { animation: fadeInUp 0.4s ease-out both; }
+</style>
+
+@section Scripts {
+    <script>
+        function confirmDelete(areaName) {
+            return confirm(`Bạn có chắc chắn muốn XÓA khu vực "${areaName}" chứ? Việc này có thể ảnh hưởng đến các Shipper đang phụ trách vùng này đó!`);
+        }
+    </script>
+}

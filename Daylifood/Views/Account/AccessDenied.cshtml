@@ -1,0 +1,205 @@
+@{
+    ViewData["Title"] = "Khu vực giới hạn - Daylifood";
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<div class="luxury-bg d-flex align-items-center justify-content-center">
+    <div id="premium-card" class="glass-card text-center shadow-2xl">
+        <div class="gold-border-top"></div>
+        
+        <div class="content-wrapper p-5">
+            <div class="icon-box mb-4">
+                <div class="glow-circle"></div>
+                <i class="bi bi-shield-lock-fill luxury-icon"></i>
+            </div>
+
+            <h1 class="display-5 fw-bold luxury-title mb-3">Xin lỗi, bạn!</h1>
+            
+            <div class="divider-gold mx-auto mb-4"></div>
+
+            <div class="message-section mb-5">
+                <h4 class="status-text">TRUY CẬP ĐẶC QUYỀN</h4>
+                <p class="description-text">
+                    Khu vực này là không gian dành riêng cho đội ngũ tinh hoa của <span class="brand-name">Daylifood</span>.
+                    Dường như bạn đang ghé thăm "phòng thử nếm" không dành cho công chúng.
+                </p>
+            </div>
+
+            <div class="action-section">
+                <a asp-controller="Home" asp-action="Intro" class="btn btn-gold-luxury rounded-pill py-3 px-5 fw-bold">
+                    <i class="bi bi-arrow-left-short me-2"></i> TRỞ VỀ TRANG CHỦ
+                </a>
+                <p class="mt-4 contact-text">Yêu cầu quyền truy cập? <a href="#">Liên hệ Quản trị viên</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --gold-gradient: linear-gradient(135deg, #d4af37 0%, #f9e2af 50%, #b8860b 100%);
+        --dark-bg: #0f0f0f;
+    }
+
+    body, html {
+        margin: 0;
+        height: 100%;
+        font-family: 'Montserrat', sans-serif;
+        overflow: hidden;
+    }
+
+    .luxury-bg {
+        min-height: 100vh;
+        background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
+        position: relative;
+    }
+
+    /* Hiệu ứng Glassmorphism */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 30px;
+        max-width: 550px;
+        width: 90%;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.1s ease-out;
+        z-index: 10;
+    }
+
+    .gold-border-top {
+        height: 5px;
+        background: var(--gold-gradient);
+        width: 100%;
+    }
+
+    /* Typography */
+    .luxury-title {
+        font-family: 'Playfair Display', serif;
+        color: #fff;
+        letter-spacing: 1px;
+    }
+
+    .status-text {
+        color: #d4af37;
+        font-size: 0.9rem;
+        letter-spacing: 4px;
+        font-weight: 600;
+    }
+
+    .description-text {
+        color: #a0a0a0;
+        line-height: 1.8;
+        font-weight: 300;
+    }
+
+    .brand-name {
+        color: #fff;
+        font-weight: 600;
+        border-bottom: 1px solid #d4af37;
+    }
+
+    /* Icon & Animation */
+    .luxury-icon {
+        font-size: 4rem;
+        background: var(--gold-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        position: relative;
+        z-index: 2;
+    }
+
+    .glow-circle {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        background: #d4af37;
+        filter: blur(50px);
+        opacity: 0.2;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .divider-gold {
+        width: 60px;
+        height: 2px;
+        background: var(--gold-gradient);
+    }
+
+    /* Button Luxury */
+    .btn-gold-luxury {
+        background: var(--gold-gradient);
+        color: #000 !important;
+        border: none;
+        box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        letter-spacing: 1px;
+        font-size: 0.85rem;
+    }
+
+        .btn-gold-luxury:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.4);
+        }
+
+    .contact-text {
+        font-size: 0.75rem;
+        color: #555;
+    }
+
+        .contact-text a {
+            color: #d4af37;
+            text-decoration: none;
+        }
+
+    /* Background Particles hiệu ứng mờ ảo */
+    .bg-particle {
+        position: absolute;
+        background: var(--gold-gradient);
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.1;
+        z-index: 1;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const card = document.getElementById('premium-card');
+        const container = document.querySelector('.luxury-bg');
+
+        // 1. Hiệu ứng Parallax khi di chuyển chuột (Tilt Effect)
+        container.addEventListener('mousemove', (e) => {
+            let xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+            let yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+            card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+        });
+
+        // Reset lại vị trí khi chuột rời đi
+        container.addEventListener('mouseleave', () => {
+            card.style.transition = "all 0.5s ease";
+            card.style.transform = `rotateY(0deg) rotateX(0deg)`;
+        });
+
+        container.addEventListener('mouseenter', () => {
+            card.style.transition = "none";
+        });
+
+        // 2. Tạo các hạt vàng bay lơ lửng phía sau
+        for (let i = 0; i < 5; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'bg-particle';
+            const size = Math.random() * 200 + 100;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.top = `${Math.random() * 100}%`;
+            particle.style.left = `${Math.random() * 100}%`;
+            container.appendChild(particle);
+        }
+    });
+</script>
